@@ -1,17 +1,5 @@
-/**
- * Netlify Serverless Function — Laporan JAVA & MJP API
- *
- * Wraps the Express app with serverless-http.
- * All /api/* requests are redirected here by netlify.toml.
- * Local dev still uses server/ with tsx (separate process).
- */
-
-import serverless from 'serverless-http'
-import express, { Request, Response, NextFunction } from 'express'
-import cors from 'cors'
+import { Handler } from '@netlify/functions'
 import { GoogleGenAI } from '@google/genai'
-
-// ─── Types ────────────────────────────────────────────────────
 
 interface ReceiptData {
   date: string
@@ -27,12 +15,6 @@ interface ReceiptData {
   paymentMethod: string
   salesPerson: string
 }
-
-interface AppError extends Error {
-  statusCode?: number
-}
-
-// ─── Gemini Prompt ────────────────────────────────────────────
 
 const EXTRACTION_PROMPT = `Kamu adalah asisten AI yang sangat akurat untuk mengekstrak data dari foto struk/nota penjualan.
 
@@ -74,8 +56,6 @@ Contoh format output:
   "salesPerson": "QODIRS"
 }`
 
-// ─── Format Receipt ───────────────────────────────────────────
-
 function formatReceipt(data: ReceiptData): string {
   const lines: string[] = []
   lines.push(`📅 Tanggal : ${data.date}`)
@@ -102,128 +82,135 @@ function formatReceipt(data: ReceiptData): string {
   return lines.join('\n')
 }
 
-// ─── Express App ──────────────────────────────────────────────
-
-const app = express()
-
-// CORS — on Netlify, client and function are on same domain,
-// so we allow all origins safely for local testing too.
-app.use(cors({ origin: true, methods: ['GET', 'POST'], allowedHeaders: ['Content-Type'] }))
-app.use(express.json({ limit: '20mb' }))
-app.use(express.urlencoded({ extended: true, limit: '20mb' }))
-
-// ─── Health Check ─────────────────────────────────────────────
-
-app.get(['/api/health', '/.netlify/functions/api/health', '/health'], (_req: Request, res: Response) => {
-  res.json({
-    status: 'ok',
-    service: 'Laporan JAVA & MJP (Serverless)',
-    timestamp: new Date().toISOString(),
-  })
+// Helper to create responses
+const createResponse = (statusCode: number, body: any) => ({
+  statusCode,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(body),
 })
 
-// ─── Transcribe Route ─────────────────────────────────────────
+export const handler: Handler = async (event, _context) => {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return createResponse(204, '')
+  }
 
-app.post(['/api/transcribe', '/.netlify/functions/api/transcribe', '/transcribe'], async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { imageBase64, apiKey: userKey } = req.body
+    const path = event.path || ''
 
-    // Validate image
-    if (!imageBase64 || typeof imageBase64 !== 'string') {
-      const err = new Error('Data gambar diperlukan (imageBase64).') as AppError
-      err.statusCode = 400
-      throw err
+    // Health Check
+    if (event.httpMethod === 'GET' && path.includes('/health')) {
+      return createResponse(200, {
+        status: 'ok',
+        service: 'Laporan JAVA & MJP (Serverless Native)',
+        timestamp: new Date().toISOString(),
+      })
     }
 
-    // Resolve API key: user custom key → server default key
-    const DEFAULT_KEY = process.env.GEMINI_API_KEY || ''
-    const resolvedKey = (typeof userKey === 'string' && userKey.trim()) ? userKey.trim() : DEFAULT_KEY
+    // Transcribe
+    if (event.httpMethod === 'POST' && path.includes('/transcribe')) {
+      // Decode body safely
+      let rawBody = event.body || ''
+      if (event.isBase64Encoded) {
+        rawBody = Buffer.from(rawBody, 'base64').toString('utf8')
+      }
 
-    if (!resolvedKey) {
-      const err = new Error('API key Gemini diperlukan. Masukkan API key di Pengaturan.') as AppError
-      err.statusCode = 400
-      throw err
+      let reqBody: any = {}
+      try {
+        reqBody = JSON.parse(rawBody)
+      } catch (e) {
+        return createResponse(400, { error: 'Format body request tidak valid (harus JSON).' })
+      }
+
+      const { imageBase64, apiKey: userKey } = reqBody
+
+      if (!imageBase64 || typeof imageBase64 !== 'string') {
+        return createResponse(400, { error: 'Data gambar diperlukan (imageBase64).' })
+      }
+
+      const DEFAULT_KEY = process.env.GEMINI_API_KEY || ''
+      const resolvedKey = (typeof userKey === 'string' && userKey.trim()) ? userKey.trim() : DEFAULT_KEY
+
+      if (!resolvedKey) {
+        return createResponse(400, { error: 'API key Gemini diperlukan. Masukkan API key di Pengaturan.' })
+      }
+
+      // Extract base64 & mime type
+      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '')
+      const mimeMatch  = imageBase64.match(/^data:(image\/\w+);base64,/)
+      const mimeType   = mimeMatch ? mimeMatch[1] : 'image/jpeg'
+
+      // Call Gemini
+      const ai = new GoogleGenAI({ apiKey: resolvedKey })
+      const result = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{
+          role: 'user',
+          parts: [
+            { text: EXTRACTION_PROMPT },
+            { inlineData: { data: base64Data, mimeType } },
+          ],
+        }],
+      })
+
+      const rawText = result.text || ''
+
+      // Parse JSON
+      let jsonString = rawText.trim()
+      if (jsonString.startsWith('```')) {
+        jsonString = jsonString.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+      }
+
+      let parsed: any
+      try {
+        parsed = JSON.parse(jsonString)
+      } catch {
+        throw new Error('Gagal memproses respons AI. Pastikan gambar nota jelas dan coba lagi.')
+      }
+
+      const receiptData: ReceiptData = {
+        date:          parsed.date          || '',
+        invoiceNumber: parsed.invoiceNumber || '',
+        name:          parsed.name          || '',
+        address:       parsed.address       || '',
+        phone:         parsed.phone         || '',
+        email:         parsed.email         || '',
+        unit:          parsed.unit          || '',
+        serialNumber:  parsed.serialNumber  || '',
+        price:         parsed.price         || '',
+        bonus:         Array.isArray(parsed.bonus) ? parsed.bonus : [],
+        paymentMethod: parsed.paymentMethod || '',
+        salesPerson:   parsed.salesPerson   || '',
+      }
+
+      return createResponse(200, {
+        formattedText: formatReceipt(receiptData),
+        rawText,
+      })
     }
 
-    const usingDefault = !userKey || !userKey.trim()
-    console.log(`[Transcribe] Using: ${usingDefault ? 'DEFAULT server key' : 'custom user key'}`)
-    console.log(`[Transcribe] Image size: ${(imageBase64.length / 1024 / 1024).toFixed(2)} MB`)
-
-    // Extract base64 & mime type
-    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '')
-    const mimeMatch  = imageBase64.match(/^data:(image\/\w+);base64,/)
-    const mimeType   = mimeMatch ? mimeMatch[1] : 'image/jpeg'
-
-    // Call Gemini
-    const ai     = new GoogleGenAI({ apiKey: resolvedKey })
-    const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [{
-        role: 'user',
-        parts: [
-          { text: EXTRACTION_PROMPT },
-          { inlineData: { data: base64Data, mimeType } },
-        ],
-      }],
-    })
-
-    const rawText = result.text || ''
-
-    // Parse JSON
-    let jsonString = rawText.trim()
-    if (jsonString.startsWith('```')) {
-      jsonString = jsonString.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
-    }
-
-    let parsed: any
-    try {
-      parsed = JSON.parse(jsonString)
-    } catch {
-      console.error('[Transcribe] Failed to parse JSON:', rawText)
-      throw new Error('Gagal memproses respons AI. Pastikan gambar nota jelas dan coba lagi.')
-    }
-
-    const receiptData: ReceiptData = {
-      date:          parsed.date          || '',
-      invoiceNumber: parsed.invoiceNumber || '',
-      name:          parsed.name          || '',
-      address:       parsed.address       || '',
-      phone:         parsed.phone         || '',
-      email:         parsed.email         || '',
-      unit:          parsed.unit          || '',
-      serialNumber:  parsed.serialNumber  || '',
-      price:         parsed.price         || '',
-      bonus:         Array.isArray(parsed.bonus) ? parsed.bonus : [],
-      paymentMethod: parsed.paymentMethod || '',
-      salesPerson:   parsed.salesPerson   || '',
-    }
-
-    const formattedText = formatReceipt(receiptData)
-    console.log('[Transcribe] Success!')
-
-    res.json({ formattedText, rawText })
+    // Not Found
+    return createResponse(404, { error: 'Route not found' })
 
   } catch (err: any) {
-    if (err.message?.includes('API_KEY_INVALID') || err.message?.includes('API key not valid')) {
-      err.statusCode = 401
-      err.message = 'API Key Gemini tidak valid. Periksa kembali API key Anda.'
-    } else if (err.message?.includes('RATE_LIMIT') || err.status === 429) {
-      err.statusCode = 429
-      err.message = 'Batas penggunaan API tercapai. Tambahkan API key custom di Pengaturan, atau coba lagi nanti.'
+    console.error('[ERROR]', err)
+    
+    let statusCode = 500
+    let message = err.message || 'Internal server error'
+
+    if (message.includes('API_KEY_INVALID') || message.includes('API key not valid')) {
+      statusCode = 401
+      message = 'API Key Gemini tidak valid. Periksa kembali API key Anda.'
+    } else if (message.includes('RATE_LIMIT') || err.status === 429) {
+      statusCode = 429
+      message = 'Batas penggunaan API tercapai. Tambahkan API key custom di Pengaturan, atau coba lagi nanti.'
     }
-    next(err)
+
+    return createResponse(statusCode, { error: message, statusCode })
   }
-})
-
-// ─── Error Handler ────────────────────────────────────────────
-
-app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
-  const statusCode = err.statusCode || 500
-  const message    = err.message    || 'Internal server error'
-  console.error(`[ERROR] ${statusCode}: ${message}`)
-  res.status(statusCode).json({ error: message, statusCode })
-})
-
-// ─── Export handler ───────────────────────────────────────────
-
-export const handler = serverless(app)
+}
