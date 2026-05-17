@@ -48,11 +48,36 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
     return () => document.removeEventListener('paste', handlePaste)
   }, [processFile])
 
+  const handlePasteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.read) {
+        alert('Browser Anda tidak mendukung tombol ini. Silakan sentuh layar & tahan -> Paste.')
+        return
+      }
+      const clipboardItems = await navigator.clipboard.read()
+      for (const clipboardItem of clipboardItems) {
+        const imageType = clipboardItem.types.find(type => type.startsWith('image/'))
+        if (imageType) {
+          const blob = await clipboardItem.getType(imageType)
+          const file = new File([blob], 'pasted-image.png', { type: imageType })
+          processFile(file)
+          return
+        }
+      }
+      alert('Tidak ada gambar di clipboard. Copy gambar terlebih dahulu.')
+    } catch (err) {
+      console.error('Failed to read clipboard:', err)
+      alert('Gagal mengakses clipboard. Pastikan browser memberi izin, atau gunakan sentuh layar & tahan -> Paste.')
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, type: 'spring', damping: 22 }}
+      style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}
     >
       <div
         onDragOver={handleDragOver}
@@ -150,6 +175,45 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
           className="hidden"
         />
       </div>
+
+      {/* Paste Button */}
+      <motion.button
+        onClick={handlePasteClick}
+        style={{
+          borderRadius: '18px',
+          padding: '14px 20px',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          backdropFilter: 'blur(12px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          color: 'rgba(255,255,255,0.85)',
+          fontSize: '14px',
+          fontWeight: 600,
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+          width: '100%',
+        }}
+        onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+          e.currentTarget.style.background = 'rgba(255,49,49,0.08)'
+          e.currentTarget.style.borderColor = 'rgba(255,49,49,0.2)'
+          e.currentTarget.style.color = '#ff6464'
+        }}
+        onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+          e.currentTarget.style.color = 'rgba(255,255,255,0.85)'
+        }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <svg style={{ width: '18px', height: '18px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+        </svg>
+        Tempel dari Keyboard
+      </motion.button>
     </motion.div>
   )
 }
