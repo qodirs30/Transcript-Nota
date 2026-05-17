@@ -13,9 +13,6 @@ export default function SettingsModal({ isOpen, onClose, apiKey, onApiKeyChange 
   const [isVisible, setIsVisible] = useState(false)
   const [localKey, setLocalKey] = useState(apiKey)
 
-  // Sync when modal opens
-  const handleModalOpen = () => setLocalKey(apiKey)
-
   const handleSave = () => {
     onApiKeyChange(localKey.trim())
     onClose()

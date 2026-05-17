@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import SettingsModal from '../components/SettingsModal'
 import ImageUploader from '../components/ImageUploader'
@@ -6,7 +6,6 @@ import ImageCropper from '../components/ImageCropper'
 import TranscriptionResult from '../components/TranscriptionResult'
 import WarningBanner from '../components/WarningBanner'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
-import Button from '../components/ui/Button'
 import { transcribeReceipt } from '../services/api'
 
 type Stage = 'upload' | 'crop' | 'processing' | 'result'

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import EmojiRain from '../components/EmojiRain'
 

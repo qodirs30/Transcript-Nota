@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react'
+import { type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { motion } from 'motion/react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
