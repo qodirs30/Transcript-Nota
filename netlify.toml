@@ -1,6 +1,6 @@
 [build]
   # Build hanya client (React/Vite)
-  command   = "cd client && npm ci && npm run build"
+  command   = "cd netlify/functions && npm install && cd ../../client && npm ci && npm run build"
   publish   = "client/dist"
   functions = "netlify/functions"
 
