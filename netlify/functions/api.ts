@@ -114,7 +114,7 @@ app.use(express.urlencoded({ extended: true, limit: '20mb' }))
 
 // ─── Health Check ─────────────────────────────────────────────
 
-app.get('/api/health', (_req: Request, res: Response) => {
+app.get(['/api/health', '/.netlify/functions/api/health', '/health'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     service: 'Laporan JAVA & MJP (Serverless)',
@@ -124,7 +124,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 // ─── Transcribe Route ─────────────────────────────────────────
 
-app.post('/api/transcribe', async (req: Request, res: Response, next: NextFunction) => {
+app.post(['/api/transcribe', '/.netlify/functions/api/transcribe', '/transcribe'], async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { imageBase64, apiKey: userKey } = req.body
 
