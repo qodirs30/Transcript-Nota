@@ -101,7 +101,7 @@ export default function AuthGatePage({ onAccessGranted }: AuthGatePageProps) {
                 transition={{ delay: 0.3 }}
                 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.75rem)', fontWeight: 700, color: 'white', lineHeight: 1.3, marginBottom: '10px' }}
               >
-                qodirs ganteng apa gak?
+                semoga qodirs tajir melintir gokil gokil aman banget
               </motion.h1>
 
               <motion.p
@@ -140,7 +140,7 @@ export default function AuthGatePage({ onAccessGranted }: AuthGatePageProps) {
                     transition: 'all 0.2s ease',
                   }}
                 >
-                  ih ganteng bangettt
+                  amiiiiiinnnn
                 </motion.button>
 
                 {/* No button — ghost glass */}
@@ -162,7 +162,7 @@ export default function AuthGatePage({ onAccessGranted }: AuthGatePageProps) {
                     transition: 'all 0.2s ease',
                   }}
                 >
-                  welek
+                  miskin luuu
                 </motion.button>
               </motion.div>
 
@@ -206,7 +206,7 @@ export default function AuthGatePage({ onAccessGranted }: AuthGatePageProps) {
           </motion.div>
 
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'white', marginBottom: '8px' }}>
-            ndasem wi seng welekkk
+            astaghfirullah
           </h2>
           <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '28px' }}>
             Jawab yang bener dong!

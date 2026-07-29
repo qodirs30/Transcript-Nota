@@ -26,3 +26,8 @@ npm-debug.log*
 
 # Vite
 client/dist/
+
+# Local Node.js binary
+node-bin/
+dev.log
+
