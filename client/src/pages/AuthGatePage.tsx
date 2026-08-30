@@ -32,7 +32,7 @@ export default function AuthGatePage({ onAccessGranted }: AuthGatePageProps) {
           <motion.div
             exit={{ opacity: 0, scale: 0.97, filter: 'blur(8px)' }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-            className="min-h-dvh flex items-center justify-center relative overflow-hidden p-6"
+            className="min-h-dvh w-full flex items-center justify-center relative overflow-hidden px-6 py-8"
             style={{ background: 'var(--color-surface-950)' }}
           >
             {/* Background mesh */}

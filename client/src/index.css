@@ -76,25 +76,28 @@ html {
   text-size-adjust: 100%;
 }
 
+html, body, #root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--color-surface-950);
   color: rgba(255, 255, 255, 0.88);
   min-height: 100dvh;
-  overflow-x: hidden;
   line-height: 1.65;
 }
-
-#root { min-height: 100dvh; }
 
 @supports (padding: env(safe-area-inset-top)) {
   body {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
   }
 }
+
 
 /* ═══════════════════════════════════════════════════════════════
    iOS 26 LIQUID GLASS — Core classes

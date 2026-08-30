@@ -68,7 +68,7 @@ export default function TranscriptionPage() {
   }, [])
 
   return (
-    <div className="min-h-dvh bg-noise" style={{ background: 'var(--color-surface-950)' }}>
+    <div className="min-h-dvh bg-noise w-full overflow-hidden" style={{ background: 'var(--color-surface-950)' }}>
       <div className="absolute inset-0 bg-mesh pointer-events-none" />
 
       {/* Ambient orbs */}
@@ -91,7 +91,7 @@ export default function TranscriptionPage() {
         }}
       />
 
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8" style={{ paddingTop: '3rem', paddingBottom: '4rem' }}>
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 sm:px-8" style={{ paddingTop: '3rem', paddingBottom: '4rem' }}>
 
         {/* ── Header ── */}
         <motion.header
