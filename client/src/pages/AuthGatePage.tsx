@@ -60,7 +60,7 @@ export default function AuthGatePage({ onAccessGranted }: AuthGatePageProps) {
               className="glass-card-elevated relative z-10 shimmer-hover"
               style={{
                 borderRadius: '28px',
-                padding: 'clamp(2rem, 5vw, 3.5rem)',
+                padding: 'clamp(1.25rem, 5vw, 3rem)',
                 width: '100%',
                 maxWidth: '420px',
                 textAlign: 'center',

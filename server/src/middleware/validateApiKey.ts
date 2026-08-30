@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
 import { config } from '../config'
 
+let keyIndex = 0
+
 /**
  * Validates API key presence.
  * - If user sends a custom apiKey → use it
- * - If no apiKey sent but server has GEMINI_API_KEY → use server default
+ * - If no apiKey sent but server has defaultGeminiKeys → use server default (round-robin)
  * - If neither → reject with 400
  */
 export function validateApiKey(req: Request, _res: Response, next: NextFunction): void {
@@ -17,9 +19,15 @@ export function validateApiKey(req: Request, _res: Response, next: NextFunction)
     return
   }
 
-  if (config.defaultGeminiKey) {
-    // Fallback to server's built-in key
-    req.body.apiKey = config.defaultGeminiKey
+  const keys = config.defaultGeminiKeys
+  if (keys && keys.length > 0) {
+    // Fallback to server's built-in keys with round-robin rotation
+    const selectedKey = keys[keyIndex % keys.length]
+    // Log key rotation for debugging
+    console.log(`[Rotation] Using API key index ${keyIndex % keys.length + 1} of ${keys.length}`)
+    
+    keyIndex = (keyIndex + 1) % keys.length
+    req.body.apiKey = selectedKey
     req.body.usingDefaultKey = true
     next()
     return
@@ -30,3 +38,4 @@ export function validateApiKey(req: Request, _res: Response, next: NextFunction)
   error.statusCode = 400
   next(error)
 }
+

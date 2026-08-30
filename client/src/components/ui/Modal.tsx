@@ -35,7 +35,7 @@ export default function Modal({ isOpen, onClose, children, allowClose = true }: 
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.92, opacity: 0, y: 8 }}
             transition={{ type: 'spring', damping: 28, stiffness: 340, mass: 0.8 }}
-            className="relative glass-modal rounded-3xl p-8 w-full shadow-2xl"
+            className="relative glass-modal rounded-3xl p-6 sm:p-8 w-full shadow-2xl"
             style={{ maxWidth: '380px' }}
             onClick={(e) => e.stopPropagation()}
           >
