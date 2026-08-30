@@ -91,7 +91,7 @@ export default function TranscriptionPage() {
         }}
       />
 
-      <div className="relative z-10 max-w-3xl mx-auto px-6 sm:px-8" style={{ paddingTop: '3rem', paddingBottom: '4rem' }}>
+      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8" style={{ paddingTop: '3rem', paddingBottom: '4rem' }}>
 
         {/* ── Header ── */}
         <motion.header
