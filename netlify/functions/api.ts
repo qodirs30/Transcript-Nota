@@ -133,8 +133,20 @@ export const handler: Handler = async (event, _context) => {
         return createResponse(400, { error: 'Data gambar diperlukan (imageBase64).' })
       }
 
-      const DEFAULT_KEY = process.env.GEMINI_API_KEY || ''
-      const resolvedKey = (typeof userKey === 'string' && userKey.trim()) ? userKey.trim() : DEFAULT_KEY
+      // API Key pool to avoid rate limits
+      const envKeys = [
+        process.env.GEMINI_API_KEY,
+        process.env.GEMINI_API_KEY_1,
+        process.env.GEMINI_API_KEY_2,
+        process.env.GEMINI_API_KEY_3
+      ].filter(Boolean) as string[]
+
+      let resolvedKey = ''
+      if (typeof userKey === 'string' && userKey.trim()) {
+        resolvedKey = userKey.trim()
+      } else if (envKeys.length > 0) {
+        resolvedKey = envKeys[Math.floor(Math.random() * envKeys.length)]
+      }
 
       if (!resolvedKey) {
         return createResponse(400, { error: 'API key Gemini diperlukan. Masukkan API key di Pengaturan.' })
@@ -191,6 +203,7 @@ export const handler: Handler = async (event, _context) => {
       return createResponse(200, {
         formattedText: formatReceipt(receiptData),
         rawText,
+        data: receiptData
       })
     }
 

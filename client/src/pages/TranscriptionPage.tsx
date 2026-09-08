@@ -7,12 +7,17 @@ import TranscriptionResult from '../components/TranscriptionResult'
 import WarningBanner from '../components/WarningBanner'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import { transcribeReceipt } from '../services/api'
+import { saveToHistory } from '../utils/historyStorage'
 
 type Stage = 'upload' | 'crop' | 'processing' | 'result'
 
 const STORAGE_KEY = 'laporan_gemini_apikey'
 
-export default function TranscriptionPage() {
+interface TranscriptionPageProps {
+  onGoToHistory: () => void
+}
+
+export default function TranscriptionPage({ onGoToHistory }: TranscriptionPageProps) {
   // Load custom API key from localStorage on startup
   const [apiKey, setApiKey] = useState<string>(() => {
     try { return localStorage.getItem(STORAGE_KEY) || '' } catch { return '' }
@@ -46,6 +51,12 @@ export default function TranscriptionPage() {
       // apiKey bisa kosong — server akan pakai default key
       const result = await transcribeReceipt(croppedDataUrl, apiKey)
       setFormattedText(result.formattedText)
+      
+      // Save to local storage history
+      if (result.data) {
+        saveToHistory(result.data)
+      }
+
       setStage('result')
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || 'Terjadi kesalahan saat memproses gambar'
@@ -91,7 +102,7 @@ export default function TranscriptionPage() {
         }}
       />
 
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 sm:px-8" style={{ paddingTop: '3rem', paddingBottom: '4rem' }}>
+      <div className="relative z-10 w-full mx-auto px-5 sm:px-8 md:px-12 lg:px-16" style={{ maxWidth: '1800px', paddingTop: '3rem', paddingBottom: '4rem' }}>
 
         {/* ── Header ── */}
         <motion.header
@@ -122,24 +133,51 @@ export default function TranscriptionPage() {
               </span>
             </div>
 
-            {/* Settings button */}
-            <motion.button
-              whileHover={{ scale: 1.06 }}
-              whileTap={{ scale: 0.94 }}
-              onClick={() => setShowSettings(true)}
-              style={{
-                position: 'relative',
-                width: '42px', height: '42px',
-                borderRadius: '14px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.09)',
-                backdropFilter: 'blur(12px)',
-                color: 'rgba(255,255,255,0.45)',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {/* History button */}
+              <motion.button
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={onGoToHistory}
+                style={{
+                  height: '42px',
+                  padding: '0 16px',
+                  borderRadius: '14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                  backdropFilter: 'blur(12px)',
+                  color: 'rgba(255,255,255,0.7)',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <svg style={{ width: '16px', height: '16px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                History
+              </motion.button>
+
+              {/* Settings button */}
+              <motion.button
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={() => setShowSettings(true)}
+                style={{
+                  position: 'relative',
+                  width: '42px', height: '42px',
+                  borderRadius: '14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                  backdropFilter: 'blur(12px)',
+                  color: 'rgba(255,255,255,0.45)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
               {/* Show dot only if custom key is set (to indicate it's active) */}
               {apiKey && (
                 <span
@@ -159,6 +197,7 @@ export default function TranscriptionPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </motion.button>
+            </div>
           </div>
 
           {/* Title */}

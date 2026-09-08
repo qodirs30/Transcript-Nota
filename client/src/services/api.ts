@@ -8,6 +8,7 @@ const api = axios.create({
 export interface TranscribeResponse {
   formattedText: string
   rawText: string
+  data?: any // Parsed receipt data
 }
 
 /**
