@@ -26,8 +26,8 @@ export default function WarningBanner() {
           </svg>
         </div>
         <div>
-          <p style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(251,191,36,0.75)', marginBottom: '3px' }}>Peringatan</p>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.33)', lineHeight: 1.55 }}>
+          <p style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(251,191,36,0.95)', marginBottom: '3px' }}>Peringatan</p>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.55 }}>
             Selalu periksa dan koreksi hasil AI — ketidakakuratan dapat terjadi terutama pada gambar buram atau kualitas rendah.
           </p>
         </div>

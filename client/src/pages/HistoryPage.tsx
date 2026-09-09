@@ -194,20 +194,21 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           {/* Sales Chart */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.1 }}
-            className="glass-card-elevated p-8 sm:p-10 lg:p-12 rounded-[2rem] relative overflow-hidden"
+            className="glass-card-elevated p-5 sm:p-8 lg:p-10 rounded-[2rem] relative overflow-hidden border border-white/10"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Tren Penjualan Bulanan</h2>
             <div className="h-64 w-full">
               {salesData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={salesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={salesData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
                     <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={12} tickLine={false} axisLine={false} dy={10} />
                     <YAxis stroke="rgba(255,255,255,0.4)" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} dx={-10} />
                     <Tooltip 
                       cursor={{ fill: 'rgba(255,255,255,0.04)', radius: 8 }}
-                      contentStyle={{ background: 'rgba(20,20,20,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+                      contentStyle={{ background: 'rgba(20,20,20,0.85)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', color: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
                       itemStyle={{ color: '#fff', fontWeight: 500 }}
+                      position={{ y: -10 }}
                     />
                     <Bar dataKey="sales" name="Transaksi" fill="rgba(255, 255, 255, 0.8)" radius={[6, 6, 6, 6]} barSize={32} />
                   </BarChart>
@@ -222,35 +223,49 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.2 }}
-            className="glass-card-elevated p-8 sm:p-10 lg:p-12 rounded-[2rem] relative overflow-hidden"
+            className="glass-card-elevated p-5 sm:p-8 lg:p-10 rounded-[2rem] relative overflow-hidden border border-white/10"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Distribusi Brand</h2>
-            <div className="h-64 w-full flex items-center justify-center">
+            <div className="h-64 w-full relative flex items-center justify-center">
               {brandData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={brandData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={70}
-                      outerRadius={90}
-                      paddingAngle={6}
-                      dataKey="value"
-                      stroke="none"
-                      cornerRadius={6}
-                    >
-                      {brandData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ background: 'rgba(20,20,20,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
-                      itemStyle={{ color: '#fff', fontWeight: 500 }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={brandData}
+                        cx="50%"
+                        cy="45%"
+                        innerRadius={65}
+                        outerRadius={85}
+                        paddingAngle={6}
+                        dataKey="value"
+                        stroke="none"
+                        cornerRadius={6}
+                      >
+                        {brandData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ background: 'rgba(20,20,20,0.85)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', color: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+                        itemStyle={{ color: '#fff', fontWeight: 500 }}
+                      />
+                      <Legend 
+                        verticalAlign="bottom" 
+                        height={36} 
+                        iconType="circle" 
+                        wrapperStyle={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', paddingTop: '10px' }} 
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  
+                  {/* Central Label */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-[36px]">
+                    <span className="text-3xl font-bold text-white/90">{filteredHistory.length}</span>
+                    <span className="text-[11px] uppercase tracking-wider text-white/50 font-medium mt-0.5">Total</span>
+                  </div>
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-white/30 text-sm font-medium">
                   Belum ada data
@@ -263,9 +278,9 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
         {/* History List/Table */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.3 }}
-          className="glass-card-elevated rounded-[2rem] overflow-hidden relative"
+          className="glass-card-elevated rounded-[2rem] overflow-hidden relative border border-white/10"
         >
-          <div className="px-8 py-6 sm:px-10 sm:py-8 lg:px-12 lg:py-10 border-b border-white/5 flex items-center justify-between">
+          <div className="px-5 py-5 sm:px-8 sm:py-6 lg:px-10 lg:py-8 border-b border-white/5 flex items-center justify-between">
             <h2 className="text-white/90 font-semibold text-xl tracking-tight">Data Transaksi ({filteredHistory.length})</h2>
           </div>
           

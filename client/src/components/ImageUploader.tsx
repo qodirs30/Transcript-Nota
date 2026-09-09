@@ -153,17 +153,8 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
           }}>
             {isDragging ? 'Lepaskan di sini!' : 'Upload Nota Kalian'}
           </p>
-          <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.3)', lineHeight: 1.5 }}>
-            Drag & drop, klik pilih file, atau{' '}
-            <kbd style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              color: 'rgba(255,100,100,0.8)',
-              background: 'rgba(255,49,49,0.08)',
-              border: '1px solid rgba(255,49,49,0.15)',
-              padding: '1px 6px',
-              borderRadius: '6px',
-            }}>Ctrl+V</kbd>
+          <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
+            Tap untuk upload atau ambil foto
           </p>
         </div>
 
@@ -182,34 +173,33 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
         style={{
           borderRadius: '18px',
           padding: '14px 20px',
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(12px)',
+          background: 'transparent',
+          border: '1px dashed rgba(255,255,255,0.15)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: '8px',
-          color: 'rgba(255,255,255,0.85)',
+          color: 'rgba(255,255,255,0.5)',
           fontSize: '14px',
-          fontWeight: 600,
+          fontWeight: 500,
           cursor: 'pointer',
           transition: 'all 0.2s ease',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+          boxShadow: 'none',
           width: '100%',
         }}
         onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-          e.currentTarget.style.background = 'rgba(255,49,49,0.08)'
-          e.currentTarget.style.borderColor = 'rgba(255,49,49,0.2)'
-          e.currentTarget.style.color = '#ff6464'
+          e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'
+          e.currentTarget.style.color = 'rgba(255,255,255,0.8)'
         }}
         onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
-          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
-          e.currentTarget.style.color = 'rgba(255,255,255,0.85)'
+          e.currentTarget.style.background = 'transparent'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+          e.currentTarget.style.color = 'rgba(255,255,255,0.5)'
         }}
         whileTap={{ scale: 0.98 }}
       >
-        <svg style={{ width: '18px', height: '18px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg style={{ width: '18px', height: '18px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
         </svg>
         Tempel dari Keyboard
