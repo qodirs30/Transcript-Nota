@@ -194,7 +194,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           {/* Sales Chart */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.1 }}
-            className="glass-card-elevated p-6 lg:p-8 rounded-3xl relative overflow-hidden"
+            className="glass-card-elevated p-8 sm:p-10 lg:p-12 rounded-[2rem] relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Tren Penjualan Bulanan</h2>
@@ -220,10 +220,9 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
             </div>
           </motion.div>
 
-          {/* Brand Analysis Chart */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.2 }}
-            className="glass-card-elevated p-6 lg:p-8 rounded-3xl relative overflow-hidden"
+            className="glass-card-elevated p-8 sm:p-10 lg:p-12 rounded-[2rem] relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Distribusi Brand</h2>
@@ -264,15 +263,15 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
         {/* History List/Table */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.3 }}
-          className="glass-card-elevated rounded-3xl overflow-hidden relative"
+          className="glass-card-elevated rounded-[2rem] overflow-hidden relative"
         >
-          <div className="p-6 lg:p-8 border-b border-white/5 flex items-center justify-between">
-            <h2 className="text-white/90 font-semibold text-lg tracking-tight">Data Transaksi ({filteredHistory.length})</h2>
+          <div className="px-8 py-6 sm:px-10 sm:py-8 lg:px-12 lg:py-10 border-b border-white/5 flex items-center justify-between">
+            <h2 className="text-white/90 font-semibold text-xl tracking-tight">Data Transaksi ({filteredHistory.length})</h2>
           </div>
           
           {isMobile ? (
             // Mobile Card View
-            <div className="p-4 space-y-4">
+            <div className="p-6 sm:p-8 space-y-5 sm:space-y-6">
               <AnimatePresence mode="popLayout">
                 {filteredHistory.length > 0 ? filteredHistory.map((item) => (
                   <motion.div 
