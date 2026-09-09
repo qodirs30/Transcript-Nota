@@ -1,120 +1,232 @@
 import { useState, useEffect, useMemo } from 'react'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { ArrowLeft, Trash2 } from 'lucide-react'
-import { getHistory, clearHistory } from '../utils/historyStorage'
+import { ArrowLeft, Trash2, Filter, ChevronDown, Palette } from 'lucide-react'
+import { getHistory, clearHistory, deleteHistoryItem, updateHistoryItemColor } from '../utils/historyStorage'
 import type { ReceiptHistory } from '../utils/historyStorage'
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6']
+const PIE_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6']
+const ITEM_COLORS = [
+  { id: 'default', value: 'transparent' },
+  { id: 'red', value: 'rgba(239, 68, 68, 0.15)' },
+  { id: 'blue', value: 'rgba(59, 130, 246, 0.15)' },
+  { id: 'green', value: 'rgba(16, 185, 129, 0.15)' },
+  { id: 'yellow', value: 'rgba(245, 158, 11, 0.15)' },
+  { id: 'purple', value: 'rgba(139, 92, 246, 0.15)' },
+]
+
+const springConfig = { type: 'spring', bounce: 0, duration: 0.4 }
+
+const getMonthYear = (dateStr: string) => {
+  const parts = dateStr.split(' ')
+  if (parts.length >= 2) return `${parts[1]} ${parts[2] || ''}`.trim()
+  return 'Lainnya'
+}
+
+const getBrand = (unitStr: string) => {
+  const unit = (unitStr || '').toUpperCase()
+  if (unit.includes('LENOVO')) return 'Lenovo'
+  if (unit.includes('ASUS')) return 'Asus'
+  if (unit.includes('HP')) return 'HP'
+  if (unit.includes('AXIOO')) return 'Axioo'
+  if (unit.includes('ACER')) return 'Acer'
+  if (unit.includes('MSI')) return 'MSI'
+  if (unit.includes('APPLE') || unit.includes('MAC')) return 'Apple'
+  return 'Lainnya'
+}
 
 export default function HistoryPage({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<ReceiptHistory[]>([])
+  const [filterMonth, setFilterMonth] = useState<string>('All')
+  const [filterBrand, setFilterBrand] = useState<string>('All')
+  const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(null)
+  
+  // Responsive check
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     setHistory(getHistory())
   }, [])
 
-  const handleClear = () => {
+  const handleClearAll = () => {
     if (confirm('Apakah Anda yakin ingin menghapus semua history?')) {
       clearHistory()
       setHistory([])
     }
   }
 
-  // Calculate Sales by Month
-  const salesData = useMemo(() => {
-    const monthlyMap: Record<string, number> = {}
-    history.forEach(item => {
-      // Very naive date parsing, assume "DD Month YYYY" like "13 May 2026"
-      const parts = item.date.split(' ')
-      if (parts.length >= 2) {
-        const monthYear = `${parts[1]} ${parts[2] || ''}`.trim()
-        monthlyMap[monthYear] = (monthlyMap[monthYear] || 0) + 1
-      }
-    })
-    
-    return Object.entries(monthlyMap).map(([name, sales]) => ({ name, sales }))
+  const handleDeleteItem = (id: string) => {
+    if (confirm('Hapus riwayat ini?')) {
+      deleteHistoryItem(id)
+      setHistory(getHistory())
+    }
+  }
+
+  const handleChangeColor = (id: string, color: string) => {
+    updateHistoryItemColor(id, color)
+    setHistory(getHistory())
+    setOpenColorPickerId(null)
+  }
+
+  // Derive filter options
+  const availableMonths = useMemo(() => {
+    const months = new Set<string>()
+    history.forEach(item => months.add(getMonthYear(item.date)))
+    return ['All', ...Array.from(months)]
   }, [history])
 
-  // Calculate Brand Analysis
+  const availableBrands = useMemo(() => {
+    const brands = new Set<string>()
+    history.forEach(item => brands.add(getBrand(item.unit)))
+    return ['All', ...Array.from(brands)]
+  }, [history])
+
+  // Filter data
+  const filteredHistory = useMemo(() => {
+    return history.filter(item => {
+      const matchMonth = filterMonth === 'All' || getMonthYear(item.date) === filterMonth
+      const matchBrand = filterBrand === 'All' || getBrand(item.unit) === filterBrand
+      return matchMonth && matchBrand
+    })
+  }, [history, filterMonth, filterBrand])
+
+  // Analytics based on FILTERED data
+  const salesData = useMemo(() => {
+    const monthlyMap: Record<string, number> = {}
+    filteredHistory.forEach(item => {
+      const my = getMonthYear(item.date)
+      monthlyMap[my] = (monthlyMap[my] || 0) + 1
+    })
+    return Object.entries(monthlyMap).map(([name, sales]) => ({ name, sales }))
+  }, [filteredHistory])
+
   const brandData = useMemo(() => {
     const brandMap: Record<string, number> = {}
-    history.forEach(item => {
-      const unit = item.unit.toUpperCase()
-      let brand = 'Lainnya'
-      if (unit.includes('LENOVO')) brand = 'Lenovo'
-      else if (unit.includes('ASUS')) brand = 'Asus'
-      else if (unit.includes('HP')) brand = 'HP'
-      else if (unit.includes('AXIOO')) brand = 'Axioo'
-      else if (unit.includes('ACER')) brand = 'Acer'
-      else if (unit.includes('MSI')) brand = 'MSI'
-      else if (unit.includes('APPLE') || unit.includes('MAC')) brand = 'Apple'
-      
+    filteredHistory.forEach(item => {
+      const brand = getBrand(item.unit)
       brandMap[brand] = (brandMap[brand] || 0) + 1
     })
-
     return Object.entries(brandMap)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
-  }, [history])
+  }, [filteredHistory])
 
   return (
-    <div className="min-h-dvh bg-noise w-full overflow-hidden" style={{ background: 'var(--color-surface-950)' }}>
-      <div className="absolute inset-0 bg-mesh pointer-events-none" />
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={springConfig}
+      className="min-h-dvh w-full overflow-y-auto bg-noise pb-24" 
+      style={{ background: 'var(--color-surface-950)' }}
+    >
+      <div className="fixed inset-0 bg-mesh pointer-events-none opacity-50" />
       
-      <div className="relative z-10 w-full mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-12" style={{ maxWidth: '1800px' }}>
-        <header className="flex items-center justify-between mb-8">
+      <div className="relative z-10 w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-8 lg:py-12 max-w-[1400px]">
+        {/* Header - Apple Style Translucent Bar behavior could be added, but static is fine here */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-4">
             <button 
               onClick={onBack}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-white/50"
+              className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-95 transition-all text-white/70"
             >
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-red-400 bg-clip-text text-transparent">
-                History & Analytics
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                Analisis Data
               </h1>
-              <p className="text-white/40 text-sm mt-1">Data penjualan tersimpan di browser Anda</p>
+              <p className="text-white/50 text-sm mt-1 font-medium">Dashboard riwayat penjualan lokal</p>
             </div>
           </div>
-          <button 
-            onClick={handleClear}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors text-red-400 text-sm font-medium"
-          >
-            <Trash2 size={16} />
-            Clear Data
-          </button>
+          
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleClearAll}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 active:scale-95 transition-all text-red-400 text-sm font-medium"
+            >
+              <Trash2 size={16} />
+              Clear All
+            </button>
+          </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-4 mb-8">
+          <div className="flex items-center gap-2 text-white/50 text-sm font-medium mr-2">
+            <Filter size={16} /> Filter:
+          </div>
+          <div className="relative">
+            <select
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(e.target.value)}
+              className="appearance-none bg-white/5 border border-white/10 text-white/90 text-sm rounded-full pl-4 pr-10 py-2 outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer backdrop-blur-md"
+            >
+              {availableMonths.map(m => (
+                <option key={m} value={m} className="bg-neutral-900">{m === 'All' ? 'Semua Bulan' : m}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+          </div>
+          
+          <div className="relative">
+            <select
+              value={filterBrand}
+              onChange={(e) => setFilterBrand(e.target.value)}
+              className="appearance-none bg-white/5 border border-white/10 text-white/90 text-sm rounded-full pl-4 pr-10 py-2 outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer backdrop-blur-md"
+            >
+              {availableBrands.map(b => (
+                <option key={b} value={b} className="bg-neutral-900">{b === 'All' ? 'Semua Brand' : b}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
           {/* Sales Chart */}
-          <div className="glass-card-elevated p-6 rounded-2xl">
-            <h2 className="text-white/80 font-semibold mb-6">Penjualan Bulanan (Total Transaksi)</h2>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.1 }}
+            className="glass-card-elevated p-6 lg:p-8 rounded-3xl relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+            <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Tren Penjualan Bulanan</h2>
             <div className="h-64 w-full">
               {salesData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={salesData}>
-                    <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <BarChart data={salesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+                    <YAxis stroke="rgba(255,255,255,0.4)" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} dx={-10} />
                     <Tooltip 
-                      cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                      contentStyle={{ background: 'rgba(20,20,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white' }}
+                      cursor={{ fill: 'rgba(255,255,255,0.04)', radius: 8 }}
+                      contentStyle={{ background: 'rgba(20,20,20,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+                      itemStyle={{ color: '#fff', fontWeight: 500 }}
                     />
-                    <Bar dataKey="sales" fill="#ff3131" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="sales" name="Transaksi" fill="rgba(255, 255, 255, 0.8)" radius={[6, 6, 6, 6]} barSize={32} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-white/30 text-sm">
+                <div className="w-full h-full flex items-center justify-center text-white/30 text-sm font-medium">
                   Belum ada data
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Brand Analysis Chart */}
-          <div className="glass-card-elevated p-6 rounded-2xl">
-            <h2 className="text-white/80 font-semibold mb-6">Analisis Brand Laptop</h2>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.2 }}
+            className="glass-card-elevated p-6 lg:p-8 rounded-3xl relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+            <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Distribusi Brand</h2>
             <div className="h-64 w-full flex items-center justify-center">
               {brandData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -123,70 +235,217 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
                       data={brandData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
+                      innerRadius={70}
+                      outerRadius={90}
+                      paddingAngle={6}
                       dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      labelLine={false}
+                      stroke="none"
+                      cornerRadius={6}
                     >
                       {brandData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip 
-                      contentStyle={{ background: 'rgba(20,20,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white' }}
+                      contentStyle={{ background: 'rgba(20,20,20,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+                      itemStyle={{ color: '#fff', fontWeight: 500 }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-white/30 text-sm">
+                <div className="w-full h-full flex items-center justify-center text-white/30 text-sm font-medium">
                   Belum ada data
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* History Table */}
-        <div className="glass-card-elevated rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-white/5">
-            <h2 className="text-white/80 font-semibold">Riwayat Transaksi</h2>
+        {/* History List/Table */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.3 }}
+          className="glass-card-elevated rounded-3xl overflow-hidden relative"
+        >
+          <div className="p-6 lg:p-8 border-b border-white/5 flex items-center justify-between">
+            <h2 className="text-white/90 font-semibold text-lg tracking-tight">Data Transaksi ({filteredHistory.length})</h2>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-white/60">
-              <thead className="bg-white/5 text-white/80">
-                <tr>
-                  <th className="px-6 py-4 font-medium whitespace-nowrap">Tanggal</th>
-                  <th className="px-6 py-4 font-medium whitespace-nowrap">Invoice</th>
-                  <th className="px-6 py-4 font-medium whitespace-nowrap">Pelanggan</th>
-                  <th className="px-6 py-4 font-medium whitespace-nowrap min-w-[200px]">Unit</th>
-                  <th className="px-6 py-4 font-medium whitespace-nowrap">Harga</th>
-                  <th className="px-6 py-4 font-medium whitespace-nowrap">Sales</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.length > 0 ? history.map((item) => (
-                  <tr key={item.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">{item.date}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.invoiceNumber}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-                    <td className="px-6 py-4 text-white/80">{item.unit}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.price}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.salesPerson}</td>
-                  </tr>
+          
+          {isMobile ? (
+            // Mobile Card View
+            <div className="p-4 space-y-4">
+              <AnimatePresence mode="popLayout">
+                {filteredHistory.length > 0 ? filteredHistory.map((item) => (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={springConfig}
+                    key={item.id} 
+                    className="p-5 rounded-2xl border border-white/5 relative"
+                    style={{ backgroundColor: item.color && item.color !== 'transparent' ? item.color : 'rgba(255,255,255,0.02)' }}
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <div className="text-white/90 font-medium mb-1">{item.name}</div>
+                        <div className="text-white/50 text-xs">{item.date} • {item.invoiceNumber}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-white/90 font-semibold">{item.price}</div>
+                        <div className="text-white/50 text-xs mt-1">{item.paymentMethod}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-white/70 text-sm mb-4 bg-black/20 p-3 rounded-xl border border-white/5">
+                      {item.unit}
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
+                      <div className="text-white/50 text-xs">Sales: <span className="text-white/80">{item.salesPerson}</span></div>
+                      
+                      <div className="flex items-center gap-2 relative">
+                        <button 
+                          onClick={() => setOpenColorPickerId(openColorPickerId === item.id ? null : item.id)}
+                          className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/60"
+                        >
+                          <Palette size={14} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteItem(item.id)}
+                          className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 active:scale-95 transition-all text-red-400"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+
+                        {/* Color Picker Popover */}
+                        <AnimatePresence>
+                          {openColorPickerId === item.id && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                              transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
+                              className="absolute bottom-full right-0 mb-2 p-2 rounded-2xl bg-neutral-900/90 backdrop-blur-xl border border-white/10 shadow-2xl flex gap-2 z-20"
+                            >
+                              {ITEM_COLORS.map(color => (
+                                <button
+                                  key={color.id}
+                                  onClick={() => handleChangeColor(item.id, color.value)}
+                                  className="w-8 h-8 rounded-full border border-white/20 hover:scale-110 active:scale-95 transition-all"
+                                  style={{ background: color.id === 'default' ? '#333' : color.value.replace('0.15', '1') }}
+                                />
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+                  </motion.div>
                 )) : (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-white/30">
-                      Belum ada data riwayat transaksi.
-                    </td>
-                  </tr>
+                  <div className="py-12 text-center text-white/40 font-medium text-sm">
+                    Tidak ada transaksi yang sesuai filter.
+                  </div>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </AnimatePresence>
+            </div>
+          ) : (
+            // Desktop Table View
+            <div className="overflow-x-auto pb-4">
+              <table className="w-full text-left text-sm text-white/70">
+                <thead className="text-white/50 text-xs uppercase tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4 font-medium">Tanggal & Invoice</th>
+                    <th className="px-6 py-4 font-medium">Pelanggan</th>
+                    <th className="px-6 py-4 font-medium min-w-[250px]">Unit</th>
+                    <th className="px-6 py-4 font-medium">Harga & Pembayaran</th>
+                    <th className="px-6 py-4 font-medium">Sales</th>
+                    <th className="px-6 py-4 font-medium text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence mode="popLayout">
+                    {filteredHistory.length > 0 ? filteredHistory.map((item) => (
+                      <motion.tr 
+                        layout
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={springConfig}
+                        key={item.id} 
+                        className="group border-b border-white/5 hover:bg-white/[0.02] transition-colors relative"
+                        style={{ backgroundColor: item.color && item.color !== 'transparent' ? item.color : '' }}
+                      >
+                        <td className="px-6 py-4">
+                          <div className="text-white/90 font-medium">{item.date}</div>
+                          <div className="text-white/40 text-xs mt-1">{item.invoiceNumber}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-white/90">{item.name}</div>
+                          <div className="text-white/40 text-xs mt-1 truncate max-w-[150px]">{item.phone}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-white/80 line-clamp-2">{item.unit}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-white/90 font-medium">{item.price}</div>
+                          <div className="text-white/40 text-xs mt-1">{item.paymentMethod}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-white/80">{item.salesPerson}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-2 relative">
+                            <button 
+                              onClick={() => setOpenColorPickerId(openColorPickerId === item.id ? null : item.id)}
+                              className="p-2.5 rounded-full bg-white/0 group-hover:bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white/40 group-hover:text-white/80"
+                            >
+                              <Palette size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteItem(item.id)}
+                              className="p-2.5 rounded-full bg-white/0 group-hover:bg-red-500/10 hover:bg-red-500/20 active:scale-95 transition-all text-transparent group-hover:text-red-400"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+
+                            {/* Color Picker Popover */}
+                            <AnimatePresence>
+                              {openColorPickerId === item.id && (
+                                <motion.div 
+                                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                                  exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                                  transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
+                                  className="absolute bottom-full right-0 mb-2 p-2 rounded-2xl bg-neutral-900/90 backdrop-blur-xl border border-white/10 shadow-2xl flex gap-2 z-20"
+                                >
+                                  {ITEM_COLORS.map(color => (
+                                    <button
+                                      key={color.id}
+                                      onClick={() => handleChangeColor(item.id, color.value)}
+                                      className="w-8 h-8 rounded-full border border-white/20 hover:scale-110 active:scale-95 transition-all"
+                                      style={{ background: color.id === 'default' ? '#333' : color.value.replace('0.15', '1') }}
+                                    />
+                                  ))}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    )) : (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-16 text-center">
+                          <div className="text-white/40 font-medium">Tidak ada transaksi yang sesuai filter.</div>
+                        </td>
+                      </tr>
+                    )}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   )
 }

@@ -13,6 +13,7 @@ export interface ReceiptHistory {
   paymentMethod: string
   salesPerson: string
   timestamp: number
+  color?: string // Added color for item tagging
 }
 
 const STORAGE_KEY = 'laporan_gemini_history'
@@ -47,5 +48,25 @@ export function clearHistory(): void {
     localStorage.removeItem(STORAGE_KEY)
   } catch {
     // ignore
+  }
+}
+
+export function deleteHistoryItem(id: string): void {
+  try {
+    const history = getHistory()
+    const filtered = history.filter(item => item.id !== id)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered))
+  } catch (error) {
+    console.error('Gagal menghapus item history', error)
+  }
+}
+
+export function updateHistoryItemColor(id: string, color: string): void {
+  try {
+    const history = getHistory()
+    const updated = history.map(item => item.id === id ? { ...item, color } : item)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+  } catch (error) {
+    console.error('Gagal mengupdate warna item history', error)
   }
 }
