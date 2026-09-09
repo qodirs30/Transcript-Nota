@@ -102,7 +102,7 @@ export default function TranscriptionPage({ onGoToHistory }: TranscriptionPagePr
         }}
       />
 
-      <div className="relative z-10 w-full mx-auto px-5 sm:px-8 md:px-12 lg:px-16" style={{ maxWidth: '1800px', paddingTop: '3rem', paddingBottom: '4rem' }}>
+      <div className="relative z-10 w-full mx-auto px-6 sm:px-8 md:px-12 lg:px-16" style={{ maxWidth: '1800px', paddingTop: '3rem', paddingBottom: '4rem' }}>
 
         {/* ── Header ── */}
         <motion.header

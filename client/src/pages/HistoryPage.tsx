@@ -128,7 +128,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
     >
       <div className="fixed inset-0 bg-mesh pointer-events-none opacity-50" />
       
-      <div className="relative z-10 w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-8 lg:py-12 max-w-[1400px]">
+      <div className="relative z-10 w-full mx-auto px-6 sm:px-8 md:px-10 lg:px-12 py-8 lg:py-12 max-w-[1400px]">
         {/* Header - Apple Style Translucent Bar behavior could be added, but static is fine here */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-4">
@@ -282,26 +282,27 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={springConfig}
                     key={item.id} 
-                    className="p-5 rounded-2xl border border-white/5 relative"
+                    className="p-6 rounded-[24px] border border-white/5 relative flex flex-col gap-1"
                     style={{ backgroundColor: item.color && item.color !== 'transparent' ? item.color : 'rgba(255,255,255,0.02)' }}
                   >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <div className="text-white/90 font-medium mb-1">{item.name}</div>
-                        <div className="text-white/50 text-xs">{item.date} • {item.invoiceNumber}</div>
+                    <div className="flex justify-between items-start gap-4 mb-2">
+                      <div className="flex-1">
+                        <div className="text-white/95 font-medium text-base mb-1.5 leading-snug">{item.name}</div>
+                        <div className="text-white/50 text-[13px] leading-tight">{item.date}</div>
+                        <div className="text-white/50 text-[13px] leading-tight mt-0.5">{item.invoiceNumber}</div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-white/90 font-semibold">{item.price}</div>
-                        <div className="text-white/50 text-xs mt-1">{item.paymentMethod}</div>
+                      <div className="text-right shrink-0">
+                        <div className="text-white/90 font-semibold text-base">{item.price}</div>
+                        <div className="text-white/50 text-[13px] mt-1">{item.paymentMethod}</div>
                       </div>
                     </div>
                     
-                    <div className="text-white/70 text-sm mb-4 bg-black/20 p-3 rounded-xl border border-white/5">
+                    <div className="text-white/75 text-[14px] leading-relaxed mb-3 bg-black/20 p-3.5 rounded-[16px] border border-white/5 mt-1 inline-block w-fit">
                       {item.unit}
                     </div>
                     
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
-                      <div className="text-white/50 text-xs">Sales: <span className="text-white/80">{item.salesPerson}</span></div>
+                    <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
+                      <div className="text-white/50 text-[13px]">Sales: <span className="text-white/80 font-medium">{item.salesPerson}</span></div>
                       
                       <div className="flex items-center gap-2 relative">
                         <button 
