@@ -166,7 +166,7 @@ export const handler: Handler = async (event, _context) => {
       // Call Gemini
       const ai = new GoogleGenAI({ apiKey: resolvedKey })
       const result = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.6-flash',
         contents: [{
           role: 'user',
           parts: [

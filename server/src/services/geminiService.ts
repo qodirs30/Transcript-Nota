@@ -85,7 +85,7 @@ export async function extractReceiptData(
 
   // Call Gemini using the new SDK API
   const result = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3.6-flash',
     contents: [
       {
         role: 'user',
