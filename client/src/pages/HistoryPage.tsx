@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { ArrowLeft, Trash2, Filter, ChevronDown, Palette } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
+import { ArrowLeft, Trash2, Filter, ChevronDown, Palette, X } from 'lucide-react'
 import { getHistory, clearHistory, deleteHistoryItem, updateHistoryItemColor } from '../utils/historyStorage'
 import type { ReceiptHistory } from '../utils/historyStorage'
 
@@ -40,6 +40,17 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
   const [filterMonth, setFilterMonth] = useState<string>('All')
   const [filterBrand, setFilterBrand] = useState<string>('All')
   const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(null)
+  const [selectedBrandForModal, setSelectedBrandForModal] = useState<string | null>(null)
+
+  const getBrandColor = (brandName: string, index: number) => {
+    if (brandName === 'Lenovo') return '#ef4444' // Red for Lenovo
+    if (brandName === 'Asus') return '#3b82f6'
+    if (brandName === 'HP') return '#10b981'
+    if (brandName === 'Axioo') return '#f59e0b'
+    if (brandName === 'Acer') return '#8b5cf6'
+    if (brandName === 'MSI') return '#ec4899'
+    return PIE_COLORS[index % PIE_COLORS.length]
+  }
   
   // Responsive check
   const [isMobile, setIsMobile] = useState(false)
@@ -117,6 +128,20 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
       .sort((a, b) => b.value - a.value)
   }, [filteredHistory])
 
+  const incentiveData = useMemo(() => {
+    let spCount = 0
+    let garskinCount = 0
+    filteredHistory.forEach(item => {
+      if (item.hasScreenProtector) spCount++
+      if (item.hasGarskin) garskinCount++
+    })
+    return {
+      spCount,
+      garskinCount,
+      total: (spCount * 20000) + (garskinCount * 20000)
+    }
+  }, [filteredHistory])
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -189,6 +214,29 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
+        {/* Incentive Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.05 }}
+          className="glass-card-elevated p-6 sm:p-8 rounded-[2rem] relative overflow-hidden border border-emerald-500/20 mb-8"
+          style={{ background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%)' }}
+        >
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 className="text-white/90 font-semibold text-lg tracking-tight mb-1">Estimasi Insentif (SP & Garskin)</h2>
+              <div className="text-white/50 text-sm flex gap-4">
+                <span>Screen Protector: <b className="text-emerald-400">{incentiveData.spCount}</b></span>
+                <span>Garskin: <b className="text-emerald-400">{incentiveData.garskinCount}</b></span>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-emerald-400">
+                Rp {incentiveData.total.toLocaleString('id-ID')}
+              </div>
+              <div className="text-white/40 text-xs mt-1 uppercase tracking-wider font-medium">Estimasi Cair Akhir Bulan</div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
           {/* Sales Chart */}
@@ -244,7 +292,12 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
                         cornerRadius={6}
                       >
                         {brandData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={getBrandColor(entry.name, index)} 
+                            onClick={() => setSelectedBrandForModal(entry.name)}
+                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                          />
                         ))}
                       </Pie>
                       <Tooltip 
@@ -461,6 +514,55 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           )}
         </motion.div>
       </div>
+
+      {/* Brand Detail Modal */}
+      <AnimatePresence>
+        {selectedBrandForModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedBrandForModal(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#111] border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col"
+            >
+              <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+                <h3 className="text-xl font-semibold text-white">Data Penjualan: <span style={{ color: getBrandColor(selectedBrandForModal, 0) }}>{selectedBrandForModal}</span></h3>
+                <button onClick={() => setSelectedBrandForModal(null)} className="p-2 rounded-full hover:bg-white/10 text-white/50 transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto custom-scrollbar">
+                {filteredHistory.filter(item => getBrand(item.unit) === selectedBrandForModal).map(item => (
+                  <div key={item.id} className="mb-4 last:mb-0 p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <div className="text-white font-medium">{item.unit}</div>
+                        <div className="text-white/50 text-sm mt-1">{item.date} • {item.invoiceNumber}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-emerald-400 font-semibold">{item.price}</div>
+                      </div>
+                    </div>
+                    {item.bonus.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-white/5">
+                        <span className="text-xs text-white/40 uppercase tracking-wider block mb-1">Bonus:</span>
+                        <p className="text-white/70 text-sm">{item.bonus.join(', ')}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {filteredHistory.filter(item => getBrand(item.unit) === selectedBrandForModal).length === 0 && (
+                   <div className="text-center text-white/40 py-8">Tidak ada data.</div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </motion.div>
   )
 }

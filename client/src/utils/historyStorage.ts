@@ -14,6 +14,8 @@ export interface ReceiptHistory {
   salesPerson: string
   timestamp: number
   color?: string // Added color for item tagging
+  hasScreenProtector?: boolean
+  hasGarskin?: boolean
 }
 
 const STORAGE_KEY = 'laporan_gemini_history'

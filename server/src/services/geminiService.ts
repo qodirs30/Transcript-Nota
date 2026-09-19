@@ -14,6 +14,8 @@ export interface ReceiptData {
   bonus: string[]
   paymentMethod: string
   salesPerson: string
+  hasScreenProtector: boolean
+  hasGarskin: boolean
 }
 
 /**
@@ -36,6 +38,8 @@ Field yang harus diekstrak:
 - "bonus": Array berisi item bonus/hadiah (contoh: ["TAS LENOVO-BP210", "MOUSE WIRELESS POLOS"]). Tulis HURUF KAPITAL.
 - "paymentMethod": Metode pembayaran (contoh: "BCA", "TUNAI", "MANDIRI")
 - "salesPerson": Nama sales/penjual (tulis HURUF KAPITAL)
+- "hasScreenProtector": true/false (Cek apakah ada "Screen Protector", "Anti Gores", atau "SP" di nota)
+- "hasGarskin": true/false (Cek apakah ada "Garskin" atau "Laminasi" di nota)
 
 Rules:
 1. Jika sebuah field TIDAK ditemukan di struk, kembalikan string kosong "" untuk field string, atau array kosong [] untuk bonus.
@@ -56,7 +60,9 @@ Contoh format output:
   "price": "Rp15.000.000",
   "bonus": ["TAS LENOVO-BP210", "MOUSE WIRELESS POLOS"],
   "paymentMethod": "BCA",
-  "salesPerson": "QODIRS"
+  "salesPerson": "QODIRS",
+  "hasScreenProtector": true,
+  "hasGarskin": false
 }`
 
 /**
@@ -125,6 +131,8 @@ export async function extractReceiptData(
       bonus: Array.isArray(parsed.bonus) ? parsed.bonus : [],
       paymentMethod: parsed.paymentMethod || '',
       salesPerson: parsed.salesPerson || '',
+      hasScreenProtector: Boolean(parsed.hasScreenProtector),
+      hasGarskin: Boolean(parsed.hasGarskin),
     }
   } catch (parseErr) {
     console.error('[GeminiService] Failed to parse JSON response:', rawText)
