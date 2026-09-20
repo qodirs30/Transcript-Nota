@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
-import { ArrowLeft, Trash2, Filter, ChevronDown, Palette, X } from 'lucide-react'
+import { ArrowLeft, Trash2, Filter, ChevronDown, Palette, X, Calendar, CreditCard, User } from 'lucide-react'
 import { getHistory, clearHistory, deleteHistoryItem, updateHistoryItemColor } from '../utils/historyStorage'
 import type { ReceiptHistory } from '../utils/historyStorage'
 
