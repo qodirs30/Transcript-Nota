@@ -171,61 +171,65 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={handleClearAll}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 active:scale-95 transition-all text-red-400 text-sm font-medium"
-            >
-              <Trash2 size={16} />
-              Clear All
-            </button>
-          </div>
-        </header>
+          </header>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4 mb-8">
-          <div className="flex items-center gap-2 text-white/50 text-sm font-medium mr-2">
-            <Filter size={16} /> Filter:
-          </div>
-          <div className="relative">
-            <select
-              value={filterMonth}
-              onChange={(e) => setFilterMonth(e.target.value)}
-              className="appearance-none bg-white/5 border border-white/10 text-white/90 text-sm rounded-full pl-4 pr-10 py-2 outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer backdrop-blur-md"
-            >
-              {availableMonths.map(m => (
-                <option key={m} value={m} className="bg-neutral-900">{m === 'All' ? 'Semua Bulan' : m}</option>
-              ))}
-            </select>
-            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+        {/* Action Bar (Filters & Clear) */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 bg-white/5 border border-white/10 p-2 rounded-[24px]">
+          <div className="flex flex-wrap items-center gap-2 pl-2">
+            <div className="flex items-center gap-2 text-white/50 text-sm font-medium mr-2">
+              <Filter size={16} />
+            </div>
+            <div className="relative">
+              <select
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                className="appearance-none bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white/90 text-sm rounded-full pl-4 pr-10 py-2 outline-none transition-all cursor-pointer backdrop-blur-md"
+              >
+                {availableMonths.map(m => (
+                  <option key={m} value={m} className="bg-neutral-900">{m === 'All' ? 'Bulan: Semua' : m}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={filterBrand}
+                onChange={(e) => setFilterBrand(e.target.value)}
+                className="appearance-none bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white/90 text-sm rounded-full pl-4 pr-10 py-2 outline-none transition-all cursor-pointer backdrop-blur-md"
+              >
+                {availableBrands.map(b => (
+                  <option key={b} value={b} className="bg-neutral-900">{b === 'All' ? 'Brand: Semua' : b}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+            </div>
           </div>
           
-          <div className="relative">
-            <select
-              value={filterBrand}
-              onChange={(e) => setFilterBrand(e.target.value)}
-              className="appearance-none bg-white/5 border border-white/10 text-white/90 text-sm rounded-full pl-4 pr-10 py-2 outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer backdrop-blur-md"
-            >
-              {availableBrands.map(b => (
-                <option key={b} value={b} className="bg-neutral-900">{b === 'All' ? 'Semua Brand' : b}</option>
-              ))}
-            </select>
-            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
-          </div>
+          <button 
+            onClick={handleClearAll}
+            className="flex items-center gap-2 px-5 py-2 rounded-full bg-red-500/10 hover:bg-red-500/20 active:scale-95 transition-all text-red-400 text-sm font-medium mr-1"
+          >
+            <Trash2 size={16} />
+            Clear All
+          </button>
         </div>
 
         {/* Incentive Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.05 }}
-          className="glass-card-elevated p-6 sm:p-8 rounded-[2rem] relative overflow-hidden border border-emerald-500/20 mb-8"
+          className="glass-card-elevated p-5 sm:p-6 rounded-3xl relative overflow-hidden border border-emerald-500/20 mb-8"
           style={{ background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%)' }}
         >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-white/90 font-semibold text-lg tracking-tight mb-1">Estimasi Insentif (SP & Garskin)</h2>
-              <div className="text-white/50 text-sm flex gap-4">
-                <span>Screen Protector: <b className="text-emerald-400">{incentiveData.spCount}</b></span>
-                <span>Garskin: <b className="text-emerald-400">{incentiveData.garskinCount}</b></span>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-xs font-medium text-emerald-300">
+                  Screen Protector: <b className="text-emerald-400">{incentiveData.spCount}</b>
+                </div>
+                <div className="bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-xs font-medium text-emerald-300">
+                  Garskin: <b className="text-emerald-400">{incentiveData.garskinCount}</b>
+                </div>
               </div>
             </div>
             <div className="text-right">
@@ -246,7 +250,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Tren Penjualan Bulanan</h2>
-            <div className="h-64 w-full">
+            <div className="h-64 w-full pb-4">
               {salesData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={salesData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
@@ -275,7 +279,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Distribusi Brand</h2>
-            <div className="h-64 w-full relative flex items-center justify-center">
+            <div className="h-72 w-full relative flex flex-col items-center justify-center pb-2">
               {brandData.length > 0 ? (
                 <>
                   <ResponsiveContainer width="100%" height="100%">
@@ -308,7 +312,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
                         verticalAlign="bottom" 
                         height={36} 
                         iconType="circle" 
-                        wrapperStyle={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', paddingTop: '10px' }} 
+                        wrapperStyle={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', paddingTop: '20px' }} 
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -337,181 +341,71 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
             <h2 className="text-white/90 font-semibold text-xl tracking-tight">Data Transaksi ({filteredHistory.length})</h2>
           </div>
           
-          {isMobile ? (
-            // Mobile Card View
-            <div className="p-6 sm:p-8 space-y-5 sm:space-y-6">
-              <AnimatePresence mode="popLayout">
-                {filteredHistory.length > 0 ? filteredHistory.map((item) => (
-                  <motion.div 
-                    layout
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={springConfig}
-                    key={item.id} 
-                    className="p-6 rounded-[24px] border border-white/5 relative flex flex-col gap-1"
-                    style={{ backgroundColor: item.color && item.color !== 'transparent' ? item.color : 'rgba(255,255,255,0.02)' }}
-                  >
-                    <div className="flex justify-between items-start gap-4 mb-2">
-                      <div className="flex-1">
-                        <div className="text-white/95 font-medium text-base mb-1.5 leading-snug">{item.name}</div>
-                        <div className="text-white/50 text-[13px] leading-tight">{item.date}</div>
-                        <div className="text-white/50 text-[13px] leading-tight mt-0.5">{item.invoiceNumber}</div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <div className="text-white/90 font-semibold text-base">{item.price}</div>
-                        <div className="text-white/50 text-[13px] mt-1">{item.paymentMethod}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-white/75 text-[14px] leading-relaxed mb-3 bg-black/20 p-3.5 rounded-[16px] border border-white/5 mt-1 inline-block w-fit">
-                      {item.unit}
-                    </div>
-                    
-                    <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
-                      <div className="text-white/50 text-[13px]">Sales: <span className="text-white/80 font-medium">{item.salesPerson}</span></div>
-                      
-                      <div className="flex items-center gap-2 relative">
-                        <button 
-                          onClick={() => setOpenColorPickerId(openColorPickerId === item.id ? null : item.id)}
-                          className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/60"
-                        >
-                          <Palette size={14} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 active:scale-95 transition-all text-red-400"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-
-                        {/* Color Picker Popover */}
-                        <AnimatePresence>
-                          {openColorPickerId === item.id && (
-                            <motion.div 
-                              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                              transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
-                              className="absolute bottom-full right-0 mb-2 p-2 rounded-2xl bg-neutral-900/90 backdrop-blur-xl border border-white/10 shadow-2xl flex gap-2 z-20"
-                            >
-                              {ITEM_COLORS.map(color => (
-                                <button
-                                  key={color.id}
-                                  onClick={() => handleChangeColor(item.id, color.value)}
-                                  className="w-8 h-8 rounded-full border border-white/20 hover:scale-110 active:scale-95 transition-all"
-                                  style={{ background: color.id === 'default' ? '#333' : color.value.replace('0.15', '1') }}
-                                />
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-                  </motion.div>
-                )) : (
-                  <div className="py-12 text-center text-white/40 font-medium text-sm">
-                    Tidak ada transaksi yang sesuai filter.
+          
+          {/* Card List View (Universal for Mobile & Desktop) */}
+          <div className="p-4 sm:p-6 lg:p-8 space-y-3">
+            <AnimatePresence mode="popLayout">
+              {filteredHistory.length > 0 ? filteredHistory.map((item) => (
+                <motion.div 
+                  layout
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={springConfig}
+                  key={item.id} 
+                  className="p-5 sm:p-6 rounded-[20px] bg-neutral-900/40 border border-zinc-800/60 hover:bg-neutral-900/60 transition-colors flex flex-col gap-3"
+                >
+                  {/* Baris 1: Nama Customer (kiri) & Nominal Harga (kanan, bold/highlight) */}
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="text-white/95 font-semibold text-base sm:text-lg">{item.name || 'Customer Tanpa Nama'}</div>
+                    <div className="text-emerald-400 font-bold text-base sm:text-lg shrink-0">{item.price || 'Rp 0'}</div>
                   </div>
-                )}
-              </AnimatePresence>
-            </div>
-          ) : (
-            // Desktop Table View
-            <div className="overflow-x-auto pb-4">
-              <table className="w-full text-left text-sm text-white/70">
-                <thead className="text-white/50 text-xs uppercase tracking-wider">
-                  <tr>
-                    <th className="px-6 py-4 font-medium">Tanggal & Invoice</th>
-                    <th className="px-6 py-4 font-medium">Pelanggan</th>
-                    <th className="px-6 py-4 font-medium min-w-[250px]">Unit</th>
-                    <th className="px-6 py-4 font-medium">Harga & Pembayaran</th>
-                    <th className="px-6 py-4 font-medium">Sales</th>
-                    <th className="px-6 py-4 font-medium text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence mode="popLayout">
-                    {filteredHistory.length > 0 ? filteredHistory.map((item) => (
-                      <motion.tr 
-                        layout
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={springConfig}
-                        key={item.id} 
-                        className="group border-b border-white/5 hover:bg-white/[0.02] transition-colors relative"
-                        style={{ backgroundColor: item.color && item.color !== 'transparent' ? item.color : '' }}
+                  
+                  {/* Baris 2: Tanggal Transaksi & Metode Pembayaran (muted text) */}
+                  <div className="flex justify-between items-center text-white/40 text-[13px] sm:text-sm">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} />
+                      <span>{item.date} • {item.invoiceNumber || 'No Invoice'}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CreditCard size={14} />
+                      <span>{item.paymentMethod || '-'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Baris 3: Tipe Unit / Laptop (tag/teks sekunder yang jelas) */}
+                  <div className="mt-1">
+                    <div className="inline-block bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-white/70 text-[13px] sm:text-sm font-medium">
+                      {item.unit || 'Unit tidak diketahui'}
+                    </div>
+                  </div>
+                  
+                  {/* Baris 4: Info Sales & Action Icons (pojok kanan bawah) */}
+                  <div className="flex items-end justify-between mt-2 pt-4 border-t border-zinc-800/60">
+                    <div className="text-white/50 text-[13px] flex items-center gap-2">
+                      <User size={14} />
+                      Sales: <span className="text-white/80 font-medium">{item.salesPerson || '-'}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 hover:bg-red-500/20 active:scale-95 transition-all text-red-400"
+                        title="Hapus Transaksi"
                       >
-                        <td className="px-6 py-4">
-                          <div className="text-white/90 font-medium">{item.date}</div>
-                          <div className="text-white/40 text-xs mt-1">{item.invoiceNumber}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-white/90">{item.name}</div>
-                          <div className="text-white/40 text-xs mt-1 truncate max-w-[150px]">{item.phone}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-white/80 line-clamp-2">{item.unit}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-white/90 font-medium">{item.price}</div>
-                          <div className="text-white/40 text-xs mt-1">{item.paymentMethod}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-white/80">{item.salesPerson}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-2 relative">
-                            <button 
-                              onClick={() => setOpenColorPickerId(openColorPickerId === item.id ? null : item.id)}
-                              className="p-2.5 rounded-full bg-white/0 group-hover:bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white/40 group-hover:text-white/80"
-                            >
-                              <Palette size={16} />
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteItem(item.id)}
-                              className="p-2.5 rounded-full bg-white/0 group-hover:bg-red-500/10 hover:bg-red-500/20 active:scale-95 transition-all text-transparent group-hover:text-red-400"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )) : (
+                <div className="py-16 text-center text-white/40 font-medium text-sm">
+                  Tidak ada transaksi yang sesuai filter.
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
 
-                            {/* Color Picker Popover */}
-                            <AnimatePresence>
-                              {openColorPickerId === item.id && (
-                                <motion.div 
-                                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                                  exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                                  transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
-                                  className="absolute bottom-full right-0 mb-2 p-2 rounded-2xl bg-neutral-900/90 backdrop-blur-xl border border-white/10 shadow-2xl flex gap-2 z-20"
-                                >
-                                  {ITEM_COLORS.map(color => (
-                                    <button
-                                      key={color.id}
-                                      onClick={() => handleChangeColor(item.id, color.value)}
-                                      className="w-8 h-8 rounded-full border border-white/20 hover:scale-110 active:scale-95 transition-all"
-                                      style={{ background: color.id === 'default' ? '#333' : color.value.replace('0.15', '1') }}
-                                    />
-                                  ))}
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        </td>
-                      </motion.tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={6} className="px-6 py-16 text-center">
-                          <div className="text-white/40 font-medium">Tidak ada transaksi yang sesuai filter.</div>
-                        </td>
-                      </tr>
-                    )}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-            </div>
-          )}
         </motion.div>
       </div>
 
