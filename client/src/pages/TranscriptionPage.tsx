@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import SettingsModal from '../components/SettingsModal'
 import ImageUploader from '../components/ImageUploader'
@@ -8,7 +8,6 @@ import WarningBanner from '../components/WarningBanner'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import { transcribeReceipt } from '../services/api'
 import { saveToHistory } from '../utils/historyStorage'
-import { Download, Upload } from 'lucide-react'
 
 type Stage = 'upload' | 'crop' | 'processing' | 'result'
 
@@ -39,48 +38,8 @@ export default function TranscriptionPage({ onGoToHistory }: TranscriptionPagePr
     } catch { /* storage not available */ }
   }, [])
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const handleExport = useCallback(() => {
-    const data = localStorage.getItem('laporan_gemini_history')
-    if (!data || data === '[]') {
-      alert('Tidak ada data history untuk diekspor.')
-      return
-    }
-    const blob = new Blob([data], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `backup_nota_${new Date().toISOString().slice(0, 10)}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }, [])
-
-  const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      try {
-        const json = event.target?.result as string
-        const parsed = JSON.parse(json)
-        if (Array.isArray(parsed)) {
-          localStorage.setItem('laporan_gemini_history', JSON.stringify(parsed))
-          alert('Data berhasil di-import! Silakan cek menu History.')
-        } else {
-          alert('Format file salah.')
-        }
-      } catch (err) {
-        alert('Gagal membaca file JSON.')
-      }
-    }
-    reader.readAsText(file)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }, [])
-
+  
+  
   const handleImageSelect = useCallback((imageDataUrl: string) => {
     setRawImage(imageDataUrl)
     setStage('crop')
@@ -257,7 +216,7 @@ export default function TranscriptionPage({ onGoToHistory }: TranscriptionPagePr
                 backgroundClip: 'text',
               }}
             >
-              Laporan JAVA & MJP
+              Upload Nota
             </h1>
           </div>
         </motion.header>
@@ -371,40 +330,7 @@ export default function TranscriptionPage({ onGoToHistory }: TranscriptionPagePr
           <WarningBanner />
         </div>
 
-        {/* ── Data Backup (Export/Import) ── */}
-        <div className="flex justify-center items-center gap-3 mt-12 mb-4">
-          <input 
-            type="file" 
-            accept=".json" 
-            ref={fileInputRef} 
-            onChange={handleImport} 
-            style={{ display: 'none' }} 
-          />
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={handleExport}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-xl text-white/60 hover:text-white/90 hover:bg-white/[0.08] transition-colors"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            <Download size={14} />
-            <span className="text-xs font-medium tracking-wide">Export</span>
-          </motion.button>
-          
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-xl text-white/60 hover:text-white/90 hover:bg-white/[0.08] transition-colors"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            <Upload size={14} />
-            <span className="text-xs font-medium tracking-wide">Import</span>
-          </motion.button>
-        </div>
-
-        {/* ── Footer ── */}
-        <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '11px', color: 'rgba(255,255,255,0.14)', letterSpacing: '0.03em' }}>
-          Laporan JAVA & MJP
-        </p>
+        
       </div>
 
       <SettingsModal

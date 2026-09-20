@@ -3,35 +3,24 @@ import { motion } from 'motion/react'
 export default function WarningBanner() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay: 0.3 }}
-      className="glass"
       style={{
-        borderRadius: '18px',
-        padding: '14px 16px',
-        borderColor: 'rgba(251,191,36,0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '6px',
+        marginTop: '16px',
+        padding: '0 8px',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-        <div style={{
-          width: '32px', height: '32px', borderRadius: '10px',
-          background: 'rgba(251,191,36,0.08)',
-          border: '1px solid rgba(251,191,36,0.12)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0, marginTop: '1px',
-        }}>
-          <svg style={{ width: '14px', height: '14px', color: 'rgba(251,191,36,0.8)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-          </svg>
-        </div>
-        <div>
-          <p style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginBottom: '3px' }}>Peringatan</p>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)', lineHeight: 1.55 }}>
-            Selalu periksa dan koreksi hasil AI — ketidakakuratan dapat terjadi terutama pada gambar buram atau kualitas rendah.
-          </p>
-        </div>
-      </div>
+      <svg style={{ width: '14px', height: '14px', color: 'rgba(255,255,255,0.4)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontWeight: 500 }}>
+        Selalu periksa hasil AI. Ketidakakuratan dapat terjadi pada foto buram.
+      </p>
     </motion.div>
   )
 }

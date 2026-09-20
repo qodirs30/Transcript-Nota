@@ -110,36 +110,16 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
           style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent)' }}
         />
 
-        {/* Upload icon container */}
+        {/* Upload Icon */}
         <motion.div
-          animate={isDragging ? { scale: 1.12, y: -6 } : { scale: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+          animate={isDragging ? { scale: 1.1, y: -4 } : { scale: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          style={{ color: isDragging ? '#ff3131' : 'rgba(255,255,255,0.8)', marginBottom: '4px' }}
         >
-          <div
-            style={{
-              width: '76px', height: '76px',
-              borderRadius: '22px',
-              background: isDragging
-                ? 'rgba(255,49,49,0.14)'
-                : 'rgba(255,255,255,0.05)',
-              border: isDragging
-                ? '1px solid rgba(255,49,49,0.25)'
-                : '1px solid rgba(255,255,255,0.09)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backdropFilter: 'blur(8px)',
-              boxShadow: isDragging
-                ? '0 8px 24px rgba(255,49,49,0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
-                : '0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08)',
-              transition: 'all 0.25s ease',
-            }}
-          >
-            <svg
-              style={{ width: '32px', height: '32px', color: isDragging ? '#ff6464' : 'rgba(255,100,100,0.75)', transition: 'color 0.25s ease' }}
-              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-            </svg>
-          </div>
+          <svg style={{ width: '48px', height: '48px', transition: 'color 0.25s ease' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+          </svg>
         </motion.div>
 
         {/* Text */}
@@ -151,9 +131,9 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
             marginBottom: '6px',
             transition: 'color 0.2s ease',
           }}>
-            {isDragging ? 'Lepaskan di sini!' : 'Upload Nota Kalian'}
+            {isDragging ? 'Lepaskan di sini!' : 'Unggah Foto Nota'}
           </p>
-          <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, fontWeight: 500 }}>
             Tap untuk upload atau ambil foto
           </p>
         </div>
@@ -171,38 +151,38 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
       <motion.button
         onClick={handlePasteClick}
         style={{
-          borderRadius: '18px',
+          borderRadius: '16px',
           padding: '14px 20px',
-          background: 'transparent',
-          border: '1px dashed rgba(255,255,255,0.15)',
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: '8px',
-          color: 'rgba(255,255,255,0.5)',
+          color: 'rgba(255,255,255,0.8)',
           fontSize: '14px',
-          fontWeight: 500,
+          fontWeight: 600,
           cursor: 'pointer',
           transition: 'all 0.2s ease',
           boxShadow: 'none',
           width: '100%',
         }}
         onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
-          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'
-          e.currentTarget.style.color = 'rgba(255,255,255,0.8)'
+          e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+          e.currentTarget.style.color = 'rgba(255,255,255,0.95)'
         }}
         onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-          e.currentTarget.style.background = 'transparent'
-          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
-          e.currentTarget.style.color = 'rgba(255,255,255,0.5)'
+          e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+          e.currentTarget.style.color = 'rgba(255,255,255,0.8)'
         }}
         whileTap={{ scale: 0.98 }}
       >
-        <svg style={{ width: '18px', height: '18px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <svg style={{ width: '18px', height: '18px', opacity: 0.7 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
         </svg>
-        Tempel dari Keyboard
+        Tempel Teks dari Clipboard
       </motion.button>
     </motion.div>
   )
