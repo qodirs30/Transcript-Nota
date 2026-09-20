@@ -153,7 +153,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
     >
       <div className="fixed inset-0 bg-mesh pointer-events-none opacity-50" />
       
-      <div className="relative z-10 w-full mx-auto px-6 sm:px-8 md:px-10 lg:px-12 py-8 lg:py-12 max-w-[1400px]">
+      <div className="relative z-10 w-full mx-auto px-8 sm:px-10 md:px-16 lg:px-20 py-8 lg:py-12 max-w-6xl">
         {/* Header - Apple Style Translucent Bar behavior could be added, but static is fine here */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-4">

@@ -145,7 +145,7 @@ export default function TranscriptionPage({ onGoToHistory }: TranscriptionPagePr
         }}
       />
 
-      <div className="relative z-10 w-full mx-auto px-6 sm:px-8 md:px-12 lg:px-16" style={{ maxWidth: '1800px', paddingTop: '3rem', paddingBottom: '4rem' }}>
+      <div className="relative z-10 w-full mx-auto px-8 sm:px-10 md:px-16 lg:px-20" style={{ maxWidth: '1200px', paddingTop: '3rem', paddingBottom: '4rem' }}>
 
         {/* ── Header ── */}
         <motion.header
