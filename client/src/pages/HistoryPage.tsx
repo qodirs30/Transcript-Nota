@@ -171,7 +171,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white ml-1">
                 Analisis Data
               </h1>
               <p className="text-white/50 text-sm mt-1 font-medium">Dashboard riwayat penjualan lokal</p>
@@ -228,7 +228,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
         >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center" style={{ gap: "16px" }}>
             <div>
-              <h2 className="text-white/90 font-semibold text-lg tracking-tight mb-1">Estimasi Insentif (SP & Garskin)</h2>
+              <h2 className="text-white/90 font-semibold text-lg mb-1 ml-1">Estimasi Insentif (SP & Garskin)</h2>
               <div className="flex flex-wrap mt-2" style={{ gap: "8px", marginTop: "8px" }}>
                 <div className="bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-xs font-medium text-emerald-300">
                   Screen Protector: <b className="text-emerald-400">{incentiveData.spCount}</b>
@@ -255,7 +255,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
             className="glass-card-elevated p-4 sm:p-6 lg:p-8 rounded-[2rem] relative overflow-hidden border border-white/10"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
-            <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Tren Penjualan Bulanan</h2>
+            <h2 className="text-white/90 font-semibold mb-6 text-lg ml-1">Tren Penjualan Bulanan</h2>
             <div className="h-64 w-full pb-4">
               {salesData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
@@ -284,7 +284,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
             className="glass-card-elevated p-4 sm:p-6 lg:p-8 rounded-[2rem] relative overflow-hidden border border-white/10"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
-            <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Distribusi Brand</h2>
+            <h2 className="text-white/90 font-semibold mb-6 text-lg ml-1">Distribusi Brand</h2>
             <div className="h-72 w-full relative flex flex-col items-center justify-center pb-2">
               {brandData.length > 0 ? (
                 <>
@@ -344,7 +344,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           className="glass-card-elevated rounded-[2rem] overflow-hidden relative border border-white/10"
         >
           <div className="px-5 py-5 sm:px-8 sm:py-6 lg:px-10 lg:py-8 border-b border-white/5 flex items-center justify-between">
-            <h2 className="text-white/90 font-semibold text-xl tracking-tight">Data Transaksi ({filteredHistory.length})</h2>
+            <h2 className="text-white/90 font-semibold text-xl ml-1">Data Transaksi ({filteredHistory.length})</h2>
           </div>
           
           
