@@ -160,10 +160,10 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
     >
       <div className="fixed inset-0 bg-mesh pointer-events-none opacity-50" />
       
-      <div className="relative z-10 w-full mx-auto max-w-6xl" style={{ paddingLeft: '24px', paddingRight: '24px', paddingTop: '2rem', paddingBottom: '3rem', boxSizing: 'border-box' }}>
+      <div className="relative z-10 w-full mx-auto max-w-6xl" style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '2rem', paddingBottom: '3rem', boxSizing: 'border-box' }}>
         {/* Header - Apple Style Translucent Bar behavior could be added, but static is fine here */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
-          <div className="flex items-center gap-4">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: "24px", marginBottom: "40px" }}>
+          <div className="flex items-center" style={{ gap: "16px" }}>
             <button 
               onClick={onBack}
               className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-95 transition-all text-white/70"
@@ -181,8 +181,8 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           </header>
 
         {/* Action Bar (Filters & Clear) */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 bg-white/5 border border-white/10 p-2 rounded-[24px]">
-          <div className="flex flex-wrap items-center gap-2 pl-2">
+        <div className="flex flex-wrap items-center justify-between bg-white/5 border border-white/10 p-2 rounded-[24px]" style={{ gap: "16px", marginBottom: "32px" }}>
+          <div className="flex flex-wrap items-center pl-2" style={{ gap: "8px" }}>
             <div className="flex items-center gap-2 text-white/50 text-sm font-medium mr-2">
               <Filter size={16} />
             </div>
@@ -224,13 +224,12 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
         {/* Incentive Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.05 }}
-          className="glass-card-elevated p-5 sm:p-6 rounded-3xl relative overflow-hidden border border-emerald-500/20 mb-8"
-          style={{ background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%)' }}
+          className="glass-card-elevated p-5 sm:p-6 rounded-3xl relative overflow-hidden border border-emerald-500/20" style={{ background: "linear-gradient(145deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%)", marginBottom: "32px" }}
         >
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center" style={{ gap: "16px" }}>
             <div>
               <h2 className="text-white/90 font-semibold text-lg tracking-tight mb-1">Estimasi Insentif (SP & Garskin)</h2>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap mt-2" style={{ gap: "8px", marginTop: "8px" }}>
                 <div className="bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-xs font-medium text-emerald-300">
                   Screen Protector: <b className="text-emerald-400">{incentiveData.spCount}</b>
                 </div>
@@ -249,7 +248,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
         </motion.div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: "24px", marginBottom: "40px" }}>
           {/* Sales Chart */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.1 }}
@@ -350,7 +349,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           
           
           {/* Card List View (Universal for Mobile & Desktop) */}
-          <div className="p-4 sm:p-6 lg:p-8 space-y-3">
+          <div className="p-4 sm:p-6 lg:p-8" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <AnimatePresence mode="popLayout">
               {filteredHistory.length > 0 ? filteredHistory.map((item) => (
                 <motion.div 
@@ -360,10 +359,10 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
                   exit={{ opacity: 0, scale: 0.98 }}
                   transition={springConfig}
                   key={item.id} 
-                  className="p-5 sm:p-6 rounded-[20px] bg-neutral-900/40 border border-zinc-800/60 hover:bg-neutral-900/60 transition-colors flex flex-col gap-3"
+                  className="p-5 sm:p-6 rounded-[20px] bg-neutral-900/40 border border-zinc-800/60 hover:bg-neutral-900/60 transition-colors flex flex-col" style={{ gap: "12px" }}
                 >
                   {/* Baris 1: Nama Customer (kiri) & Nominal Harga (kanan, bold/highlight) */}
-                  <div className="flex justify-between items-start gap-4">
+                  <div className="flex justify-between items-start" style={{ gap: "16px" }}>
                     <div className="text-white/95 font-semibold text-base sm:text-lg">{item.name || 'Customer Tanpa Nama'}</div>
                     <div className="text-emerald-400 font-bold text-base sm:text-lg shrink-0">{item.price || 'Rp 0'}</div>
                   </div>

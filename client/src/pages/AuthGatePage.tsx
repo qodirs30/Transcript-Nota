@@ -33,7 +33,7 @@ export default function AuthGatePage({ onAccessGranted }: AuthGatePageProps) {
             exit={{ opacity: 0, scale: 0.97, filter: 'blur(8px)' }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             className="min-h-dvh w-full flex items-center justify-center relative overflow-hidden"
-            style={{ background: 'var(--color-surface-950)', paddingLeft: '24px', paddingRight: '24px', paddingTop: '24px', paddingBottom: '32px', boxSizing: 'border-box' }}
+            style={{ background: 'var(--color-surface-950)', paddingLeft: '16px', paddingRight: '16px', paddingTop: '24px', paddingBottom: '32px', boxSizing: 'border-box' }}
           >
             {/* Background mesh */}
             <div className="absolute inset-0 bg-mesh bg-noise" />
