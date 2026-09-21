@@ -153,7 +153,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
     >
       <div className="fixed inset-0 bg-mesh pointer-events-none opacity-50" />
       
-      <div className="relative z-10 w-full mx-auto px-8 sm:px-10 md:px-16 lg:px-20 py-8 lg:py-12 max-w-6xl">
+      <div className="relative z-10 w-full mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-8 lg:py-12 max-w-6xl">
         {/* Header - Apple Style Translucent Bar behavior could be added, but static is fine here */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-4">
@@ -246,7 +246,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
           {/* Sales Chart */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.1 }}
-            className="glass-card-elevated p-5 sm:p-8 lg:p-10 rounded-[2rem] relative overflow-hidden border border-white/10"
+            className="glass-card-elevated p-4 sm:p-6 lg:p-8 rounded-[2rem] relative overflow-hidden border border-white/10"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Tren Penjualan Bulanan</h2>
@@ -275,7 +275,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: 0.2 }}
-            className="glass-card-elevated p-5 sm:p-8 lg:p-10 rounded-[2rem] relative overflow-hidden border border-white/10"
+            className="glass-card-elevated p-4 sm:p-6 lg:p-8 rounded-[2rem] relative overflow-hidden border border-white/10"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <h2 className="text-white/90 font-semibold mb-6 text-lg tracking-tight">Distribusi Brand</h2>
