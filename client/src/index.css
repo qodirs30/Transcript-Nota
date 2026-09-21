@@ -262,11 +262,11 @@ body {
    Inputs
    ═══════════════════════════════════════════════════════════════ */
 
-textarea, input[type="text"], input[type="password"] {
+textarea, input[type="text"], input[type="password"], select {
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 16px;
 }
-textarea:focus, input:focus { outline: none; }
+textarea:focus, input:focus, select:focus { outline: none; }
 
 /* ═══════════════════════════════════════════════════════════════
    Selection & Touch
