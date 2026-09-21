@@ -156,11 +156,11 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
       exit={{ opacity: 0 }}
       transition={springConfig}
       className="min-h-dvh w-full overflow-y-auto bg-noise pb-24" 
-      style={{ background: 'var(--color-surface-950)' }}
+      style={{ background: 'var(--color-surface-950)', overflowX: 'hidden' }}
     >
       <div className="fixed inset-0 bg-mesh pointer-events-none opacity-50" />
       
-      <div className="relative z-10 w-full mx-auto px-6 sm:px-8 md:px-12 lg:px-20 py-8 lg:py-12 max-w-6xl">
+      <div className="relative z-10 w-full mx-auto max-w-6xl" style={{ paddingLeft: '24px', paddingRight: '24px', paddingTop: '2rem', paddingBottom: '3rem', boxSizing: 'border-box' }}>
         {/* Header - Apple Style Translucent Bar behavior could be added, but static is fine here */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-4">
