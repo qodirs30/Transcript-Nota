@@ -37,7 +37,7 @@ const getBrand = (unitStr: string) => {
 
 export default function HistoryPage({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<ReceiptHistory[]>([])
-  const [filterMonth, setFilterMonth] = useState<string>('All')
+  const [filterTime, setFilterTime] = useState<string>('All')
   const [filterBrand, setFilterBrand] = useState<string>('All')
   const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(null)
   const [selectedBrandForModal, setSelectedBrandForModal] = useState<string | null>(null)
@@ -101,11 +101,18 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
   // Filter data
   const filteredHistory = useMemo(() => {
     return history.filter(item => {
-      const matchMonth = filterMonth === 'All' || getMonthYear(item.date) === filterMonth
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+      let matchTime = true;
+      if (filterTime === 'Hari Ini') matchTime = now - item.timestamp < oneDay;
+      else if (filterTime === 'Minggu Ini') matchTime = now - item.timestamp < 7 * oneDay;
+      else if (filterTime === 'Bulan Ini') matchTime = now - item.timestamp < 30 * oneDay;
+      else if (filterTime === 'Tahun Ini') matchTime = now - item.timestamp < 365 * oneDay;
+      
       const matchBrand = filterBrand === 'All' || getBrand(item.unit) === filterBrand
-      return matchMonth && matchBrand
+      return matchTime && matchBrand
     })
-  }, [history, filterMonth, filterBrand])
+  }, [history, filterTime, filterBrand])
 
   // Analytics based on FILTERED data
   const salesData = useMemo(() => {
@@ -153,7 +160,7 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
     >
       <div className="fixed inset-0 bg-mesh pointer-events-none opacity-50" />
       
-      <div className="relative z-10 w-full mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-8 lg:py-12 max-w-6xl">
+      <div className="relative z-10 w-full mx-auto px-6 sm:px-8 md:px-12 lg:px-20 py-8 lg:py-12 max-w-6xl">
         {/* Header - Apple Style Translucent Bar behavior could be added, but static is fine here */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-4">
@@ -181,12 +188,12 @@ export default function HistoryPage({ onBack }: { onBack: () => void }) {
             </div>
             <div className="relative">
               <select
-                value={filterMonth}
-                onChange={(e) => setFilterMonth(e.target.value)}
+                value={filterTime}
+                onChange={(e) => setFilterTime(e.target.value)}
                 className="appearance-none bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white/90 text-sm rounded-full pl-4 pr-10 py-2 outline-none transition-all cursor-pointer backdrop-blur-md"
               >
-                {availableMonths.map(m => (
-                  <option key={m} value={m} className="bg-neutral-900">{m === 'All' ? 'Bulan: Semua' : m}</option>
+                {['All', 'Hari Ini', 'Minggu Ini', 'Bulan Ini', 'Tahun Ini'].map((t) => (
+                  <option key={t} value={t} className="bg-neutral-900">{t === 'All' ? 'Waktu: Semua' : t}</option>
                 ))}
               </select>
               <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
