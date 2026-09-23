@@ -1,10 +1,14 @@
 {
   "name": "laporan-java-mjp-root",
   "version": "1.0.0",
-  "description": "Root package for running client and server concurrently",
+  "description": "Root package for Vercel deployment",
   "scripts": {
     "dev": "npm --prefix client run dev & npm --prefix server run dev",
-    "install-all": "npm install --prefix client && npm install --prefix server",
-    "build": "npm run build --prefix client && npm run build --prefix server"
+    "install-client": "npm install --prefix client",
+    "build": "npm run install-client && npm run build --prefix client"
+  },
+  "dependencies": {
+    "@google/genai": "^2.3.0",
+    "@vercel/node": "^3.0.12"
   }
 }
