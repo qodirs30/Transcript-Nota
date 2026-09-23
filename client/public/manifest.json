@@ -1,0 +1,16 @@
+{
+  "name": "Laporan JAVA & MJP",
+  "short_name": "Laporan",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/logo-agres.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
