@@ -129,7 +129,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       try {
         result = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
+          model: 'gemini-1.5-pro',
           contents: [{
             role: 'user',
             parts: [
@@ -139,7 +139,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }],
         })
       } catch (err: any) {
-        console.warn('[FALLBACK] gemini-3.8-flash gagal. Mencoba gemini-3.6-flash...', err.message)
+        console.warn('[FALLBACK] gemini-1.5-pro gagal. Mencoba gemini-1.5-flash...', err.message)
         let fallbackKey = resolvedKey;
         if (!userKey && envKeys.length > 1) {
            const otherKeys = envKeys.filter(k => k !== resolvedKey);
@@ -148,7 +148,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const fallbackAi = new GoogleGenAI({ apiKey: fallbackKey })
         
         result = await fallbackAi.models.generateContent({
-          model: 'gemini-3.6-flash',
+          model: 'gemini-1.5-flash',
           contents: [{
             role: 'user',
             parts: [
@@ -203,6 +203,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error('[ERROR]', err)
     let statusCode = 500
     let message = err.message || 'Internal server error'
+    
+    // Parse JSON error if it's a stringified JSON
+    if (message.startsWith('{')) {
+      try {
+        const parsedErr = JSON.parse(message);
+        if (parsedErr.error && parsedErr.error.message) {
+          message = parsedErr.error.message;
+        }
+      } catch (e) {}
+    }
+    
+    // Translate 503
+    if (message.includes('high demand') || message.includes('503')) {
+      statusCode = 503;
+      message = 'Server Google Gemini sedang penuh (High Demand). Silakan coba klik tombol upload lagi dalam beberapa detik.';
+    }
 
     if (message.includes('API_KEY_INVALID') || message.includes('API key not valid')) {
       statusCode = 401
