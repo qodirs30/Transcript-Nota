@@ -129,7 +129,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       try {
         result = await ai.models.generateContent({
-          model: 'gemini-1.5-pro',
+          model: 'gemini-3.8-flash',
           contents: [{
             role: 'user',
             parts: [
@@ -139,7 +139,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }],
         })
       } catch (err: any) {
-        console.warn('[FALLBACK] gemini-1.5-pro gagal. Mencoba gemini-1.5-flash...', err.message)
+        console.warn('[FALLBACK] gemini-3.8-flash gagal. Mencoba gemini-3.6-flash...', err.message)
         let fallbackKey = resolvedKey;
         if (!userKey && envKeys.length > 1) {
            const otherKeys = envKeys.filter(k => k !== resolvedKey);
@@ -148,7 +148,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const fallbackAi = new GoogleGenAI({ apiKey: fallbackKey })
         
         result = await fallbackAi.models.generateContent({
-          model: 'gemini-1.5-flash',
+          model: 'gemini-3.6-flash',
           contents: [{
             role: 'user',
             parts: [
