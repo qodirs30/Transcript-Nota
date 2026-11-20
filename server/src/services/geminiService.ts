@@ -111,8 +111,11 @@ export async function extractReceiptData(
     // Try to extract JSON from the response (handle potential markdown wrapping)
     let jsonString = rawText.trim()
     
-    // Remove markdown code block if present
-    if (jsonString.startsWith('```')) {
+    // More robust JSON extraction using regex
+    const jsonMatch = jsonString.match(/\{.*\}/s)
+    if (jsonMatch) {
+      jsonString = jsonMatch[0]
+    } else if (jsonString.startsWith('```')) {
       jsonString = jsonString.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
     }
 
