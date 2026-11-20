@@ -105,15 +105,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const envKeys = [
         process.env.GEMINI_API_KEY,
         process.env.GEMINI_API_KEY_1,
-        process.env.GEMINI_API_KEY_2,
-        process.env.GEMINI_API_KEY_3
+        process.env.GEMINI_API_KEY_2
       ].filter(Boolean) as string[]
 
       let resolvedKey = ''
+      let fallbackKey1 = ''
+      let fallbackKey2 = ''
+
       if (typeof userKey === 'string' && userKey.trim()) {
         resolvedKey = userKey.trim()
+        fallbackKey1 = userKey.trim()
+        fallbackKey2 = userKey.trim()
       } else if (envKeys.length > 0) {
-        resolvedKey = envKeys[Math.floor(Math.random() * envKeys.length)]
+        resolvedKey = envKeys[0]
+        fallbackKey1 = envKeys[1] || envKeys[0]
+        fallbackKey2 = envKeys[2] || envKeys[1] || envKeys[0]
       }
 
       if (!resolvedKey) {
@@ -129,7 +135,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       try {
         result = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
+          model: 'gemini-3-flash-preview',
           contents: [{
             role: 'user',
             parts: [
@@ -139,24 +145,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }],
         })
       } catch (err: any) {
-        console.warn('[FALLBACK] gemini-3.8-flash gagal. Mencoba gemini-3.6-flash...', err.message)
-        let fallbackKey = resolvedKey;
-        if (!userKey && envKeys.length > 1) {
-           const otherKeys = envKeys.filter(k => k !== resolvedKey);
-           fallbackKey = otherKeys[Math.floor(Math.random() * otherKeys.length)];
+        console.warn('[FALLBACK 1] Gagal dengan Key 1. Mencoba dengan Key 2...', err.message)
+        try {
+          const fallbackAi1 = new GoogleGenAI({ apiKey: fallbackKey1 })
+          result = await fallbackAi1.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: [{
+              role: 'user',
+              parts: [
+                { text: EXTRACTION_PROMPT },
+                { inlineData: { data: base64Data, mimeType } },
+              ],
+            }],
+          })
+        } catch (err2: any) {
+          console.warn('[FALLBACK 2] Gagal dengan Key 2. Mencoba dengan Key 3...', err2.message)
+          const fallbackAi2 = new GoogleGenAI({ apiKey: fallbackKey2 })
+          result = await fallbackAi2.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: [{
+              role: 'user',
+              parts: [
+                { text: EXTRACTION_PROMPT },
+                { inlineData: { data: base64Data, mimeType } },
+              ],
+            }],
+          })
         }
-        const fallbackAi = new GoogleGenAI({ apiKey: fallbackKey })
-        
-        result = await fallbackAi.models.generateContent({
-          model: 'gemini-3.6-flash',
-          contents: [{
-            role: 'user',
-            parts: [
-              { text: EXTRACTION_PROMPT },
-              { inlineData: { data: base64Data, mimeType } },
-            ],
-          }],
-        })
       }
 
       const rawText = result.text || ''
